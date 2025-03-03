@@ -1,0 +1,259 @@
+﻿@model OrderListVM
+@{
+    ViewData["Title"] = "Order List";
+    ViewData["action"] = "OrderList";
+    ViewData["pagename"] = "OrderList";
+
+    Layout = "/Views/Shared/_DashboardLayout.cshtml";
+    int Start = Model.CurrentPage > 1 ? Model.CurrentPage - 1 : Model.CurrentPage;
+    int End = Model.CurrentPage < Model.TotalPages ? Model.CurrentPage + 1 : Model.CurrentPage;
+
+
+    var result = (TempData["result"] == null) ? 0 : (bool)TempData["result"] ? 1 : 2;      //NUll --> 0        ,   True --> 1    ,   False --> 2
+    var Message = (TempData["message"] == null) ? "" : (string)TempData["message"];      //NUll --> 0        ,   True --> 1    ,   False --> 2
+
+    string StatusIcon(int StatusId){
+        string icon = StatusId switch {
+            1 => """fa-solid text-danger fa-circle-dot""",
+            2 => """fa-solid text-warning fa-circle-dot""",
+            3 => """fa-solid text-primary fa-truck-fast""",
+            4 => """fa-solid text-success fw-bold mt-1 fa-check border border-2 border-success px-1""",
+            5 => """fa-solid text-danger fa-xmark border border-2 border-danger px-1""",
+            6 => """fa-solid text-primary fa-rotate""",
+        };
+        return icon;
+    }
+    string StatusName(string StatusId){
+        string name = StatusId switch
+        {
+            "0" => "All",
+            "1" => "pending   ",
+            "2" => "Processing",
+            "3" => "Shipping  ",
+            "4" => "Delivered ",
+            "5" => "Canceled  ",
+            "6" => "Refunded  ",
+        };
+
+    return name;
+    }
+}
+
+
+
+
+@* // First section *@
+<div class="row justify-content-between mt-2">
+    <div class="col-5 ">
+        <p class="h2 fw-bold">Orders</p>
+    </div>
+</div>
+
+
+
+
+@* // Filter by Method , Status *@
+<div class="row mt-2">
+
+    <div class="col-md-1 text-center">
+        <p class="fw-bold">filter by :</p>
+    </div>
+
+    <div class="col-md-11">
+        <div class="row">
+            <div class="col-md-3  mb-2 me-0">
+                <button class="text-white btn fw-bold w-100 btn-warning" type="button" data-bs-toggle="collapse" data-bs-target="#statuscollapse" aria-expanded="false" aria-controls="collapseExample">
+                    status: @StatusName(Model.status)
+                </button>
+            </div>
+            <div class="col-md-9 mb-2  ms-0">
+                <div class="collapse bottom-0  mt-1" id="statuscollapse">
+                    <a asp-action="OrderList" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-status="0" asp-route-method="@Model.method" class="p-2 border border-2 text-dark text-decoration-none">All</a>
+                    <a asp-action="OrderList" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-status="1" asp-route-method="@Model.method" class="p-2 border border-2 text-dark text-decoration-none">pending   </a>
+                    <a asp-action="OrderList" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-status="2" asp-route-method="@Model.method" class="p-2 border border-2 text-dark text-decoration-none">Processing</a>
+                    <a asp-action="OrderList" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-status="3" asp-route-method="@Model.method" class="p-2 border border-2 text-dark text-decoration-none">Shipping  </a>
+                    <a asp-action="OrderList" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-status="4" asp-route-method="@Model.method" class="p-2 border border-2 text-dark text-decoration-none">Delivered </a>
+                    <a asp-action="OrderList" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-status="5" asp-route-method="@Model.method" class="p-2 border border-2 text-dark text-decoration-none">Canceled  </a>
+                    <a asp-action="OrderList" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-status="6" asp-route-method="@Model.method" class="p-2 border border-2 text-dark text-decoration-none">Refunded  </a>
+                </div>
+            </div>
+
+            <div class="col-md-3 me-0">
+                <button class="text-white btn fw-bold w-100 btn-warning" type="button" data-bs-toggle="collapse" data-bs-target="#methodcollapse" aria-expanded="false" aria-controls="collapseExample">
+                    method: @Model.method
+                </button>
+            </div>
+            <div class="col-md-9 ms-0">
+                <div class="collapse bottom-0  mt-1" id="methodcollapse">
+                    <a asp-action="OrderList" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-status="@Model.status" asp-route-method="All" asp-controller="Dashboard" class="p-2 border border-2 text-dark text-decoration-none">All</a>
+                    <a asp-action="OrderList" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-status="@Model.status" asp-route-method="online" asp-controller="Dashboard" class="p-2 border border-2 text-dark text-decoration-none">Online</a>
+                    <a asp-action="OrderList" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-status="@Model.status" asp-route-method="cash" asp-controller="Dashboard" class="p-2 border border-2 text-dark text-decoration-none">Cash</a>
+                    <a asp-action="OrderList" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-status="@Model.status" asp-route-method="credit" asp-controller="Dashboard" class="p-2 border border-2 text-dark text-decoration-none">Credit</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    
+</div>
+
+
+
+@* // Second section *@
+<div class="row mt-4 justify-content-around">
+    <div class="col-md-10 mx-auto">
+        <form class="" method="get" asp-action="OrderList" asp-controller="Dashboard">
+            <div class="input-group">
+                <button type="submit" asp-route-orderby="@Model.orderby" class="input-group-text" id="basic-addon1"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <input class="form-control" name="searchtext" value="@Model.searchtext" placeholder="Search by customer,payment method,status" style="height:6vh">
+            </div>
+        </form>
+    </div>
+    <div class="col-md-2  mx-auto align-self-center"><span class="h4">Count : @Model.OrderCount</span> </div>
+</div>
+
+
+
+
+
+@* // Third section *@
+<div class="row mt-3 justify-content-end">
+    <div class="col-12">
+        <table class="table table-secondary">
+            <thead class="">
+                <tr class="text-center">
+                    <th style="border-radius:20px 0 0 0 "><a class="text-decoration-none text-dark" asp-action="OrderList" asp-controller="Dashboard" asp-route-orderby="1" asp-route-status="@Model.status" asp-route-method="@Model.method" asp-route-searchtext="@Model.searchtext"> Order no. </a></th>
+                    <th><a class="text-decoration-none text-dark" asp-action="OrderList" asp-controller="Dashboard" asp-route-orderby="2" asp-route-status="@Model.status" asp-route-method="@Model.method" asp-route-searchtext="@Model.searchtext"> Customer </a></th>
+                    <th><a class="text-decoration-none text-dark" asp-action="OrderList" asp-controller="Dashboard" asp-route-orderby="3" asp-route-status="@Model.status" asp-route-method="@Model.method" asp-route-searchtext="@Model.searchtext"> Total Amount </a></th>
+                    <th><a class="text-decoration-none text-dark" asp-action="OrderList" asp-controller="Dashboard" asp-route-orderby="4" asp-route-status="@Model.status" asp-route-method="@Model.method" asp-route-searchtext="@Model.searchtext"> Payment Method </a></th>
+                    <th><a class="text-decoration-none text-dark" asp-action="OrderList" asp-controller="Dashboard" asp-route-orderby="5" asp-route-status="@Model.status" asp-route-method="@Model.method" asp-route-searchtext="@Model.searchtext"> Order Status </a></th>
+                    <th><a class="text-decoration-none text-dark" asp-action="OrderList" asp-controller="Dashboard" asp-route-orderby="6" asp-route-status="@Model.status" asp-route-method="@Model.method" asp-route-searchtext="@Model.searchtext"> Order Date </a></th>
+                    <th style="border-radius:0 20px 0 0 ">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.OrderDetailInOrderList)
+                {
+                    <tr class="text-center">
+                        <td class="py-2 pb-0">@order.OrderId</td>
+                        <td class="py-2 pb-0">@order.Customer</td>
+                        <td class="py-2 pb-0">@order.TotalAmount</td>
+                        <td class="py-2 pb-0"><p class="shadow py-1 fw-bold">@order.PaymentMethod</p></td>
+                        <td class="py-2 pb-0"><p class="shadow py-1"><i class="@StatusIcon(order.OrderStatusId)"></i> @order.OrderStatus</p></td>
+                        <td class="py-2 pb-0">@order.OrderDate</td>
+                        <td class="py-2 pb-0">
+                            <p><a asp-action="OrderDetails" asp-controller="Dashboard" asp-route-OrderId="@order.OrderId" class="fw-bold bg-primary rounded-pill px-3 py-2 text-decoration-none btn text-white">View Details,</a></p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @* // Pagination section *@
+    <div class="col-md-3 ">
+        <nav aria-label="Page navigation ">
+            <ul class="pagination ">
+                <li class="page-item border-1 @(Model.CurrentPage == 1? "disabled":"") border-warning border">
+                    <a class="page-link" asp-action="OrderList" asp-route-status="@Model.status" asp-route-method="@Model.method" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-currentpage="@(Model.CurrentPage - 1)" aria-label="Previous" style="color:#ef9f10">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                @for (int i = Start; i <= End; i++)
+                {
+                    <li class="page-item border-1 border-warning border"><a asp-route-status="@Model.status" asp-route-method="@Model.method" style="color:#ef9f10" class="page-link" asp-action="OrderList" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-currentpage="@i">@i</a></li>
+                }
+
+                <li class="page-item border-1 border-warning border @(Model.CurrentPage == Model.TotalPages? "disabled":"")">
+                    <a class="page-link " style="color:#ef9f10" asp-route-status="@Model.status" asp-route-method="@Model.method" asp-action="OrderList" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-currentpage="@(Model.CurrentPage + 1)" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+
+
+@* // Forth section *@
+<div class="row mt-3 border-top border-3">
+    <div class="col-md-12">
+        <p class="h2 fw-bold text-decoration-underline">Bulk Upload</p>
+        <p class="h4 ">Upload Orders in bluk with an Excel file. Each row in the file should include the following columns: OrderId ,Customer ,Total Amount ,Payment Method ,Order Status,Order Date</p>
+    </div>
+    <div class="col-md-12 mt-2">
+        <form class="w-100" method="post" asp-action="GetOrderExcelFile" asp-controller="Dashboard">
+            <input hidden name="searchtext" value="@Model.searchtext" />
+            <input hidden name="orderby" value="@Model.orderby" />
+            <input hidden name="method" value="@Model.method" />
+            <input hidden name="status" value="@Model.status" />
+            <input type="submit" class="btn btncol fw-bold text-white px-3 py-2 w-50" value="upload excel file" />
+        </form>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+@* // Forth Part Tasts *@
+<div id="toastContainer" class="position-fixed top-0   p-3" style="z-index: 1050;right:10%">
+    <div id="toastSuccess" class="toast btncol text-white border-dark border-3 @(result == 1? "show" : "")" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header btncol text-white">
+            <strong class="me-auto h5">Success</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body h6" id="toastSuccessMessage">@Message</div>
+    </div>
+
+    <div id="toastError" class="toast bg-danger text-white  border-dark border-3 @(result == 2? "show" : "")" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-danger text-white">
+            <strong class="me-auto h5">Error</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body h6" id="toastErrorMessage">@Message</div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var successToast = document.getElementById("toastSuccess");
+            var errorToast = document.getElementById("toastError");
+
+            function showToast(toastElement) {
+                if (toastElement.classList.contains("show")) {
+                    setTimeout(function () {
+                        var toastInstance = new bootstrap.Toast(toastElement);
+                        toastInstance.hide(); 
+                    }, 2500); 
+                }
+            }
+
+            showToast(successToast);
+            showToast(errorToast);
+        });
+    </script>
+}

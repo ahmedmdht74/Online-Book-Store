@@ -1,0 +1,246 @@
+﻿@model UserDashboardVM
+@{
+    ViewData["Title"] = "UserDashboard";
+    Layout = "/Views/Shared/_UserDashboardLayout.cshtml";
+}
+
+
+
+
+
+@* // Second Section  ==> Book Recommendations  *@
+<div class="row bg-light my-2">
+    <p class="h4 px-4 py-2 text-decoration-underline">Book Recommendations</p>
+
+    @foreach (var book in Model.Recommendations)
+    {
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="row g-0">
+                    <div class="col-md-4 ps-2 align-self-center">
+                        <a asp-action="BookDetails" asp-route-BookId="@book.BookId" asp-controller="Home" class="card-text text-dark text-decoration-none">
+                            <img src="@(book.BookImage == null? "http://books.google.com/books/content?id=x9NDbpRYu50C&printsec=frontcover&img=1&zoom=1&source=gbs_api" : book.BookImage)" class="img-fluid rounded-start" alt="...">
+                        </a>
+                    </div>
+                    <div class="col-md-8 p-1 ">
+                        <div class="card-body">
+                            <h5 class="card-title"><a asp-action="BookDetails" asp-route-BookId="@book.BookId" asp-controller="Home" class="text-dark text-decoration-none">@book.BookName</a></h5>
+                            <a asp-action="BookDetails" asp-route-BookId="@book.BookId" asp-controller="Home" class="card-text text-dark text-decoration-none">@book.Description</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+
+
+</div>
+
+
+
+
+@* // Third Section ==> Wishlist  *@
+<div class="row bg-light my-2">
+    <div class="col-6">
+        <p class="h4 px-4 py-2 text-decoration-underline">Wishlist</p>
+    </div>
+    <div class="col-6 text-end">
+        <a asp-action="UserFavorites" asp-controller="UserDashboard" class="@((Model.UserWishlist == null || Model.UserWishlist.Count == 0)? "d-none":"") btn h6 mt-1 me-2" style="border:2px solid #ef9f10">All Books in your wishlist</a>
+    </div>
+
+
+
+    @if (Model.UserWishlist != null && Model.UserWishlist.Count > 0)
+    {
+        @foreach (var item in Model.UserWishlist)
+        {
+            <div class="col-md-6 ">
+                <div class="row my-2 mx-1 py-2" style="background-color:#d3d3d3">
+                    <div class="col-md-2 text-center">
+                        <a asp-action="BookDetails" asp-route-BookId="@item.BookId" asp-controller="Home" class="card-text text-dark text-decoration-none">
+                            <img src="@(item.BookImage == null? "http://books.google.com/books/content?id=x9NDbpRYu50C&printsec=frontcover&img=1&zoom=1&source=gbs_api" : item.BookImage)" alt="bok1" class="img-thumbnail rounded rounded-circle w-75" />
+                        </a>
+                    </div>
+                    <div class="col-md-7 align-self-center">
+                        <p class="h6 m-0 mt-1"><a asp-action="BookDetails" asp-route-BookId="@item.BookId" asp-controller="Home" class="text-dark text-decoration-none">@item.BookName</a></p>
+                        <p class="text-muted"><a asp-action="BookDetails" asp-route-BookId="@item.BookId" asp-controller="Home" class="text-muted text-decoration-none"> by : @item.AuthorName</a></p>
+                    </div>
+                    <div class="col-md-3 align-self-center text-center">
+                        <button id="addToCartBtn" data-book-id="@item.BookId" class="btn btncol text-white">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+
+        }
+    }
+    else{
+        <div class="col-md-12 align-self-center text-center">
+            <p style="background-color:#d3d3d3" class="h3 p-3 rounded rounded-pill">No Books in your WishList yet.....</p>
+        </div>
+    }
+    
+
+
+</div>
+
+
+
+
+@* // Fourth Section  ==>  Orders *@
+<div class="row bg-light my-2">
+    <div class="col-6">
+        <p class="h4 px-4 py-2 text-decoration-underline">Last Orders</p>
+    </div>
+
+    <div class="@((Model.Orders == null || Model.Orders.Count == 0)? "d-none":"") col-6 text-end">
+        <a asp-action="UserOrders" asp-controller="UserDashboard" class="btn h6 mt-1 me-2" style="border:2px solid #ef9f10">Get all Orders</a>
+    </div>
+
+
+    <div class="col-md-12 ">
+        <div class="row my-2 mx-1 py-2" >
+            @if (Model.Orders != null && Model.Orders.Count > 0)
+            {
+                <table class="table table-bordered table-hover" style="background-color:#d3d3d3">
+                    <thead>
+                        <tr class="text-center">
+                            <th>Num</th>
+                            <th>Created Date</th>
+                            <th>Ordered By</th>
+                            <th>Items</th>
+                            <th>Tracking View</th>
+                            <th>Total Amount</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Orders)
+                        {
+                            <tr class="text-center">
+                                <td>@item.OrderId</td>
+                                <td>@item.OrderDate</td>
+                                <td>@item.OrderedBy</td>
+                                <td>@item.ItemCount</td>
+                                <td>
+                                    <button type="button" class="btn btncol" data-bs-toggle="modal" data-bs-target="#Truckdetails@(item.OrderId)"><i class="fa-solid fa-truck text-white"></i></button>
+                                </td>
+                                <td>@item.TotalPrice</td>
+                                <td> <a asp-action="UserOrderDetails" asp-controller="UserDashboard" asp-route-OrderId="@item.OrderId" class="btn btncol text-white">Order details</a> </td>
+                            </tr>
+                            <div class="modal fade" id="Truckdetails@(item.OrderId)" data-bs-keyboard="false" tabindex="-1" aria-labelledby="TruckdetailsLabel@(item.OrderId)" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="TruckdetailsLabel@(item.OrderId)">Tracking Details</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-3 h4 text-center">
+                                                    <i class="fa-solid fa-hourglass-start p-3 " style="border-radius:50%;border:4px solid @(item.StatusId > 1 || item.StatusId == 1 ? "#ef9f10": "#d3d3d3 ");color:@(item.StatusId > 1 || item.StatusId == 1 ? "#ef9f10": "#d3d3d3 ")"></i>
+                                                </div>
+                                                <div class="col-3 h4 text-center">
+                                                    <i class="fa-solid fa-people-carry-box p-3 " style="border-radius:50%;border:4px solid @(item.StatusId > 2 || item.StatusId == 2 ? "#ef9f10": "#d3d3d3 ");color:@(item.StatusId > 2 || item.StatusId == 2 ? "#ef9f10": "#d3d3d3 ")"></i>
+                                                </div>
+                                                <div class="col-3 h4 text-center">
+                                                    <i class="fa-solid fa-truck p-3  " style="border-radius:50%;border:4px solid @(item.StatusId > 3 || item.StatusId == 3 ? "#ef9f10": "#d3d3d3 ");color:@(item.StatusId > 3 || item.StatusId == 3 ? "#ef9f10": "#d3d3d3 ")"></i>
+                                                </div>
+                                                <div class="col-3 h4 text-center">
+                                                    <i class="fa-solid fa-gift p-3 " style="border-radius:50%;border:4px solid @(item.StatusId > 4 || item.StatusId == 4 ? "#ef9f10": "#d3d3d3 ");color:@(item.StatusId > 4 || item.StatusId == 4 ? "#ef9f10": "#d3d3d3 ")"></i>
+                                                </div>
+
+
+                                                @for (int j = 0; j < 4; j++)
+                                                {
+                                                    <div class="col-3 h4 text-center ">
+                                                        <span class="h6">@item.StatusNames[j].Name</span>
+                                                    </div>
+                                                }
+
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <a asp-action="UserOrderDetails" asp-controller="UserDashboard" asp-route-OrderId="@item.OrderId" class="btn btncol text-white">Order details</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </tbody>
+                </table>
+            }
+            else{
+                <div class="col-md-12  align-self-center text-center">
+                    <p style="background-color:#d3d3d3" class="h3 p-3 rounded rounded-pill">No Orders you make so far.....</p>
+                </div>
+            }
+        </div>
+    </div>
+
+
+</div>
+
+
+
+@* // Forth Part Tasts *@
+<div id="toastContainer" class="position-fixed bottom-0 w-25 h-25 start-0 p-3" style="z-index: 1050;">
+    <div id="toastSuccess" class="toast btncol text-white   border-dark border-3 " role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header btncol text-white">
+            <strong class="me-auto h5">Success</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body h6" id="toastSuccessMessage">Item added to cart successfully!</div>
+    </div>
+
+    <div id="toastError" class="toast bg-danger text-white  border-dark border-3 " role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-danger text-white">
+            <strong class="me-auto h5">Error</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body h6" id="toastErrorMessage">Failed to add item to cart.</div>
+    </div>
+</div>
+
+
+
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            $(document).on("click", "#addToCartBtn", function () {
+                let bookId = $(this).data("book-id"); 
+
+                $.ajax({
+                    url: `/Home/AddNewBook?BookId=${bookId}&Quantity=1`,
+                    type: "GET",
+                    success: function (response) {
+                        if (response.result) {
+                            $("#toastSuccessMessage").text(response.message); 
+                            showToast("toastSuccess", 2000);
+                            updateCartCount();
+                        } else {
+                            $("#toastErrorMessage").text(response.message); 
+                            showToast("toastError", 2000);
+                        }
+                    },
+                    error: function () {
+                        $("#toastErrorMessage").text("An unexpected error occurred.");
+                        showToast("toastError", 2000);
+                    }
+                });
+            });
+
+            // Function to show toast
+            function showToast(toastId, duration = 5000) {
+                let toastElement = document.getElementById(toastId);
+                if (toastElement) {
+                    let toast = new bootstrap.Toast(toastElement, { delay: duration });
+                    toast.show();
+                }
+            }
+        });
+
+    </script>
+}

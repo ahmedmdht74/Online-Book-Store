@@ -1,0 +1,179 @@
+﻿@model ReportListVM
+@{
+    ViewData["Title"] = "Report List";
+    ViewData["action"] = "ReportList";
+    ViewData["pagename"] = "ReportList";
+
+    Layout = "/Views/Shared/_DashboardLayout.cshtml";
+    int Start = Model.CurrentPage > 1 ? Model.CurrentPage - 1 : Model.CurrentPage;
+    int End = Model.CurrentPage < Model.TotalPages ? Model.CurrentPage + 1 : Model.CurrentPage;
+
+    string StatusIcon(string status){
+        string Icon = status switch
+        {
+            "New" => "🔴",
+            "InProcess" => "🔵",
+            "Replied" => "🟢"
+        };
+        return Icon;
+    }
+    string StatusName(string StatusId)
+    {
+        string name = StatusId switch
+        {
+            "0" => "All",
+            "1" => "New   ",
+            "2" => "InProcess",
+            "3" => "Replied  ",
+        };
+
+        return name;
+    }
+}
+
+
+
+
+
+@* // First section *@
+<div class="row justify-content-between mt-2">
+    <div class="col-5 ">
+        <p class="h2 fw-bold">Reports</p>
+    </div>
+</div>
+
+
+
+
+@* // Filter by Method , Status *@
+<div class="row mt-2">
+
+    <div class="col-md-1 text-center">
+        <p class="fw-bold">filter by :</p>
+    </div>
+
+    <div class="col-md-11">
+        <div class="row">
+            <div class="col-md-3  mb-2 me-0">
+                <button class="text-white btn fw-bold w-100 btn-warning" type="button" data-bs-toggle="collapse" data-bs-target="#statuscollapse" aria-expanded="false" aria-controls="collapseExample">
+                    status : @StatusName(Model.status)
+                </button>
+            </div>
+            <div class="col-md-9 mb-2  ms-0">
+                <div class="collapse bottom-0  mt-2" id="statuscollapse">
+                    <a asp-action="ReportList" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-status="0" asp-route-searchtext="@Model.searchtext" class="p-2 m-1 border border-2 text-dark text-decoration-none">All</a>
+                    <a asp-action="ReportList" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-status="1" asp-route-searchtext="@Model.searchtext" class="p-2 m-1 border border-2 text-dark text-decoration-none">New</a>
+                    <a asp-action="ReportList" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-status="2" asp-route-searchtext="@Model.searchtext" class="p-2 m-1 border border-2 text-dark text-decoration-none">InProcess   </a>
+                    <a asp-action="ReportList" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-status="3" asp-route-searchtext="@Model.searchtext" class="p-2 m-1 border border-2 text-dark text-decoration-none">Replied</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+
+
+
+@* // Second section *@
+<div class="row mt-4 justify-content-around">
+    <div class="col-md-10 mx-auto">
+        <form class="" method="get" asp-action="ReportList" asp-controller="Dashboard">
+            <div class="input-group">
+                <button type="submit" asp-route-orderby="@Model.orderby" class="input-group-text" id="basic-addon1"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <input class="form-control" name="searchtext" value="@Model.searchtext" placeholder="Search by Name ,Email ,status " style="height:6vh">
+            </div>
+        </form>
+    </div>
+    <div class="col-md-2  mx-auto align-self-center"><span class="h4">Count : @Model.ReportCount</span> </div>
+</div>
+
+
+
+
+
+
+@* // Third section *@
+<div class="row mt-3 justify-content-end">
+    <div class="col-12">
+        <table class="table table-secondary">
+            <thead class="">
+                <tr class="text-center">
+                    <th style="border-radius:20px 0 0 0 "><a class="text-decoration-none text-dark" asp-action="ReportList" asp-route-status="@Model.status" asp-controller="Dashboard" asp-route-orderby="1" asp-route-searchtext="@Model.searchtext"> Report no. </a></th>
+                    <th><a class="text-decoration-none text-dark" asp-action="ReportList" asp-route-status="@Model.status" asp-controller="Dashboard" asp-route-orderby="2" asp-route-searchtext="@Model.searchtext"> Name </a></th>
+                    <th><a class="text-decoration-none text-dark" asp-action="ReportList" asp-route-status="@Model.status" asp-controller="Dashboard" asp-route-orderby="3" asp-route-searchtext="@Model.searchtext"> Email </a></th>
+                    <th><a class="text-decoration-none text-dark" asp-action="ReportList" asp-route-status="@Model.status" asp-controller="Dashboard" asp-route-orderby="4" asp-route-searchtext="@Model.searchtext"> Subject </a></th>
+                    <th><a class="text-decoration-none text-dark" asp-action="ReportList" asp-route-status="@Model.status" asp-controller="Dashboard" asp-route-orderby="5" asp-route-searchtext="@Model.searchtext"> Date </a></th>
+                    <th><a class="text-decoration-none text-dark" asp-action="ReportList" asp-route-status="@Model.status" asp-controller="Dashboard" asp-route-orderby="6" asp-route-searchtext="@Model.searchtext"> Status </a></th>
+                    <th style="border-radius:0 20px 0 0 ">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var report in Model.ReportDetailsInReportLists)
+                {
+                    <tr class="text-center">
+                        <td class="py-2 pb-0">@report.Id</td>
+                        <td class="py-2 pb-0">@report.Name</td>
+                        <td class="py-2 pb-0">@report.Email</td>
+                        <td class="py-2 pb-0">@report.Subject</td>
+                        <td class="py-2 pb-0">@report.Date.ToString("dd MMM yyyy")</td>
+                        <td class="py-2 pb-0"><p class="shadow fw-bold py-1">@StatusIcon(report.Status) @report.Status</p></td>
+                        <td class="py-2 pb-0">
+                            <p><a asp-action="ReportDetails" asp-controller="Dashboard" asp-route-ReportId="@report.Id" class="fw-bold btncol rounded-pill p-2 text-decoration-none btn text-white">open</a></p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @* // Pagination section *@
+    <div class="col-md-3 ">
+        <nav aria-label="Page navigation ">
+            <ul class="pagination ">
+                <li class="page-item border-1 @(Model.CurrentPage == 1? "disabled":"") border-warning border">
+                    <a class="page-link" asp-action="ReportList" asp-route-status="@Model.status" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-currentpage="@(Model.CurrentPage - 1)" aria-label="Previous" style="color:#ef9f10">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                @for (int i = Start; i <= End; i++)
+                {
+                    <li class="page-item border-1 border-warning border"><a style="color:#ef9f10" class="page-link" asp-route-status="@Model.status" asp-action="ReportList" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-currentpage="@i">@i</a></li>
+                }
+
+                <li class="page-item border-1 border-warning border @(Model.CurrentPage == Model.TotalPages? "disabled":"")">
+                    <a class="page-link " style="color:#ef9f10" asp-route-status="@Model.status" asp-action="ReportList" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-currentpage="@(Model.CurrentPage + 1)" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+
+
+
+@* // Forth section *@
+<div class="row mt-3 border-top border-3">
+    <div class="col-md-12">
+        <p class="h2 fw-bold text-decoration-underline">Bulk Upload</p>
+        <p class="h4 ">Upload Report in bluk with an Excel file. Each row in the file should include the following columns: ReportId ,Name ,Email ,Subject ,Message ,Date , Status </p>
+    </div>
+    <div class="col-md-12 mt-2">
+        <form class="w-100" method="post" asp-action="GetReportsExcelFile" asp-controller="Dashboard">
+            <input hidden name="searchtext" value="@Model.searchtext" />
+            <input hidden name="orderby" value="@Model.orderby" />
+            <input hidden name="status" value="@Model.status" />
+            <input type="submit" class="btn btncol fw-bold text-white px-3 py-2 w-50" value="upload excel file" />
+        </form>
+    </div>
+</div>
+
+
+
+

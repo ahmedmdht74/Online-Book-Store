@@ -1,0 +1,365 @@
+﻿@model OrderDetailsVM
+@{
+    ViewData["Title"] = "Order Details";
+    ViewData["action"] = "OrderDetails";
+    ViewData["pagename"] = "OrderDetails";
+    var result = (TempData["result"] == null) ? 0 : (bool)TempData["result"] ? 1 : 2;      //NUll --> 0        ,   True --> 1    ,   False --> 2
+    var Message = (TempData["message"] == null) ? "" : (string)TempData["message"];      //NUll --> 0        ,   True --> 1    ,   False --> 2
+
+    Layout = "/Views/Shared/_DashboardLayout.cshtml";
+}
+
+
+
+
+@* // First section *@
+<div class="row justify-content-between mt-2">
+    <div class="col-md-5 ">
+        <p class="h2 fw-bold">Order #@Model.OrderId</p>
+        <p class="text-muted h6 ms-4">Placed on @Model.OrderDate</p>
+    </div>
+    <div class="col-2 text-end align-self-center">
+        <button class="btn btn-warning text-white fw-bold" type="button" data-bs-toggle="collapse" data-bs-target=".multi-collapse" aria-expanded="false" aria-controls="Actioncollapse Infocollapse">Show</button>
+        @if (string.IsNullOrEmpty(Model.DeliveyId))
+        {
+            <button class="btn btn-warning mt-2 text-white fw-bold" type="button" data-bs-toggle="modal" data-bs-target="#ChangeDeliveryModal" aria-expanded="false" aria-controls="Changecollapse">Change Delivery</button>
+        }
+    </div>
+</div>
+
+
+
+
+<!--  Change Delivery Modal  -->
+<div class="modal fade" id="ChangeDeliveryModal" tabindex="-1" aria-labelledby="ChangeDeliveryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" asp-controller="Dashboard" asp-action="ChangeDelivery">
+            <input hidden name="OrderId" value="@Model.OrderId" />
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ChangeDeliveryModalLabel">Change Delivery ...</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @foreach (var deliverer in Model.CityDeliveries)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" @(Model.DeliveyId == deliverer.Id ? "checked" : "") value="@deliverer.Id" name="DeliveyId" id="flexRadioDefault_@deliverer.Id">
+                            <label class="form-check-label" for="flexRadioDefault_@deliverer.Id">
+                                @(deliverer.FirstName + " " + deliverer.LastName)
+                            </label>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn  fw-bold btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn fw-bold btn-danger"> Confirm</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+
+
+
+@* // second section *@
+<div class="row justify-content-between mt-2">
+
+
+
+
+    @* // Order Status & Actions *@
+    <div class="col-md-12 ">
+        <button class=" border border-0 bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#Actioncollapse" aria-expanded="false" aria-controls="Actioncollapse">
+            <p class="h3 p-1">Order Status & Actions</p>
+        </button>
+    </div>
+
+    <div class="col-md-12 p-2  collapse show multi-collapse" id="Actioncollapse">
+
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <p class="h4 text-decoration-underline">Order Status Progress</p>
+            </div>
+            <div class="col-md-12 row m-0 justify-content-between">
+                <div class="progress" style="height: 5px;">
+                    <div class="progress-bar bg-warning w-@Model.StatusStage" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="col text-end h6 fw-bold mt-1">Pending</div>
+                <div class="col text-end h6 fw-bold mt-1">Processing</div>
+                <div class="col text-end h6 fw-bold mt-1">Shipping</div>
+                <div class="col text-end h6 fw-bold mt-1">Delivered</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <p class="h4 text-decoration-underline">Order Actions</p>
+            </div>
+            <div class="col-md-12 row m-0">
+
+
+                <div class="col-6">
+                    <form method="post" asp-action="UpdateOrderStatus" asp-controller="Dashboard" class="row">
+                        <input hidden name="OrderId" value="@Model.OrderId" />
+                        <div class="col-md-6">
+                            <button type="submit" class="btn @(Model.StatusStage < 100 ? "":"disabled") w-100 fw-bold btn-primary p-2"><i class="fa-solid fa-arrow-right"></i> Next Status</button>
+                            <div class="text-danger h6 p-2" asp-validation-summary="All">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            @* // Delivery Button *@
+                            <button type="button" class="btn w-100 fw-bold btn-light text-primary p-2 @(Model.StatusStage < 75 ? "":"disabled")" data-bs-toggle="collapse" data-bs-target="#Deliverycollapse" aria-expanded="false" aria-controls="Deliverycollapse">
+                                <i class="fa-solid fa-bicycle"></i> Assign Delivery
+                            </button>
+                            
+                            @* // Delivery Model *@
+                            <div class="collapse accordion-collapse border border-5 border-light p-2" id="Deliverycollapse">
+                                @foreach(var deliverer in Model.CityDeliveries)
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" @(Model.DeliveyId == deliverer.Id ? "checked" : "") value="@deliverer.Id" name="DeliveyId" id="flexRadio_@deliverer.Id">
+                                        <label class="form-check-label" for="flexRadio_@deliverer.Id">
+                                            @(deliverer.FirstName + " " + deliverer.LastName)
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-3 ">
+                    <form method="post" asp-action="CancelOrder" asp-controller="Dashboard">
+                        <!-- Cancel button -->
+                        <button type="button" class="btn w-100 fw-bold btn-danger p-2 @(Model.StatusStage >= 100 ? "disabled":"")" data-bs-toggle="modal" data-bs-target="#CancelModal">
+                            <i class="fa-solid fa-calendar-xmark"></i> Cancel Order
+                        </button>
+                        <input hidden name="OrderId" value="@Model.OrderId"/>
+                        <!-- Cancel Modal -->
+                        <div class="modal fade" id="CancelModal" tabindex="-1" aria-labelledby="CancelModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="CancelModalLabel">Are you sure ? ,Cancel order...</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn  fw-bold btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn fw-bold btn-danger"> Confirm</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-3 ">
+                    <form method="post" asp-action="RefundOrder" asp-controller="Dashboard">
+                        <input hidden name="OrderId" value="@Model.OrderId"/>
+                        <button type="submit" class="btn w-100 fw-bold btn-success p-2 @(Model.StatusId == 5 || Model.StatusId == 6 ? "disabled":"")"><i class="fa-solid fa-reply"></i> Proccess Refund</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    @* // Order Information *@
+    <div class="col-md-12 border-4 border-top">
+        <button class=" border border-0 bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#Infocollapse" aria-expanded="false" aria-controls="Infocollapse">
+            <p class="h3 p-1">Order Information</p>
+        </button>
+    </div>
+    
+    <div class="col-md-12 p-2 collapse multi-collapse" id="Infocollapse">
+
+        <div class="row justify-content-between">
+            <div class="col h5 ">
+                👤 Customer Name: 
+            </div>
+            <div class="col h5 text-end">
+                @Model.CustomerName
+            </div>
+        </div>
+        <div class="row justify-content-between">
+            <div class="col h5">
+                📞 Phone: 
+            </div>
+            <div class="col h5 text-end">
+                @Model.Phone
+            </div>
+        </div>
+        <div class="row justify-content-between">
+            <div class="col h5">
+                ✉ Email: 
+            </div>
+            <div class="col h5 text-end">
+                @Model.Email
+            </div>
+        </div>
+        <div class="row justify-content-between">
+            <div class="col h5">
+                📍 Shipping Address: 
+            </div>
+            <div class="col h5 text-end">
+                @Model.ShippingAddress
+            </div>
+        </div>
+        <div class="row justify-content-between">
+            <div class="col h5">
+                💳 Payment Method: 
+            </div>
+            <div class="col h5 text-end">
+                @Model.PaymentMethod
+            </div>
+        </div>
+        <div class="row justify-content-between">
+            <div class="col h5">
+                💰 Total Amount: 
+            </div>
+            <div class="col h5 text-end">
+                @Model.Total
+            </div>
+        </div>
+        <div class="row justify-content-between">
+            <div class="col h5">
+                📅 Order Date:
+            </div>
+            <div class="col h5 text-end">
+                @Model.OrderDate
+            </div>
+        </div>
+        <div class="row justify-content-between">
+            <div class="col h5">
+                📅 Shipping Date:
+            </div>
+            <div class="col h5 text-end">
+                @Model.ShippingDate
+            </div>
+        </div>
+        <div class="row justify-content-between">
+            <div class="col h5">
+                🧭 Order Status:
+            </div>
+            <div class="col h5 text-end">
+                @Model.OrderStatus
+            </div>
+        </div>
+
+
+        <div class="row mt-3">
+            <div class="col-12">
+                <p class="h4 text-decoration-underline">Order Details</p>
+            </div>
+
+
+            <div class="col-md-12">
+                <table class="table table-secondary">
+                    <thead class="">
+						<tr class="">
+                            <th style="width:80px;border-radius:20px 0 0 0 "></th>
+                            <th> Title </th>
+                            <th> Quantity </th>
+                            <th> Price </th>
+                            <th style="border-radius:0 20px 0 0 ">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var book in Model.BookDetailsInOrder)
+                        {
+                            <tr class="">
+								<td class="py-2 pb-0">
+                                    <img src="@book.Image" alt="Book1" class="img-thumbnail img-fluid w-100 rounded rounded-pill"/>
+                                </td>
+                                <td class="py-2 pb-0">@book.Title</td>
+                                <td class="py-2 pb-0">@book.Quantity</td>
+                                <td class="py-2 pb-0">@book.Price</td>
+                                <td class="py-2 pb-0">@book.TotalAmount</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+        <div class="row mt-2 justify-content-between">
+            <div class="col h5">
+                Sub Total:
+            </div>
+            <div class="col h5 text-end">
+                @Model.SubTotal
+            </div>
+        </div>
+        <div class="row justify-content-between">
+            <div class="col h5">
+                Shipping Fee:
+            </div>
+            <div class="col h5 text-end">
+                @Model.DeliveryFee
+            </div>
+        </div>
+        <div class="row justify-content-between">
+            <div class="col h5">
+                Total :
+            </div>
+            <div class="col h5 text-end">
+                @Model.Total
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+@* // Forth Part Tasts *@
+<div id="toastContainer" class="position-fixed top-0   p-3" style="z-index: 1050;right:10%">
+    <div id="toastSuccess" class="toast btncol text-white border-dark border-3 @(result == 1? "show" : "")" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header btncol text-white">
+            <strong class="me-auto h5">Success</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body h6" id="toastSuccessMessage">@Message</div>
+    </div>
+
+    <div id="toastError" class="toast bg-danger text-white  border-dark border-3 @(result == 2? "show" : "")" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-danger text-white">
+            <strong class="me-auto h5">Error</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body h6" id="toastErrorMessage">@Message</div>
+    </div>
+</div>
+
+
+
+
+@section Scripts{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var successToast = document.getElementById("toastSuccess");
+            var errorToast = document.getElementById("toastError");
+
+            function showToast(toastElement) {
+                if (toastElement.classList.contains("show")) {
+                    setTimeout(function () {
+                        var toastInstance = new bootstrap.Toast(toastElement);
+                        toastInstance.hide(); 
+                    }, 2500); 
+                }
+            }
+
+            showToast(successToast);
+            showToast(errorToast);
+        });
+    </script>
+}

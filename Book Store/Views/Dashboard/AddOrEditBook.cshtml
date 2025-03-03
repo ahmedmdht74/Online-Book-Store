@@ -1,0 +1,109 @@
+﻿@model BookDataVM
+
+@{
+    ViewData["Title"] = "Book List";
+    ViewData["action"] = "AddOrEditBook";
+    string hint = Model.Id == null ? "Add" : "Edit";
+    ViewData["pagename"] = "BookManagement"+$"({hint})";
+
+    Layout = "/Views/Shared/_DashboardLayout.cshtml";
+    var Genres = new SelectList(Model.Genres, "Id", "Name",Model.GenreId);
+    var Authors = new SelectList(Model.Authors, "Id", "Name", Model.AuthorId);
+}
+
+
+
+@* // First section *@
+<div class="row justify-content-center mt-2">
+    <div class="col-md-12 text-center">
+        <p class="fw-bold h3 ms-4 text-decoration-underline">@(Model.Id == null ? "Add new Book" : "Edit Book")</p>
+    </div>
+
+
+    <div class="col-md-12">
+        <form method="post" class="row border border-2  pt-3" enctype="multipart/form-data" asp-action="AddOrEditBook" asp-controller="Dashboard">
+            <div class="col-md-6 px-3">
+                <input hidden asp-for="@Model.Id"/>
+                <div class="mb-3">
+                    <label asp-for="@Model.BookName" class="form-label fw-bold"></label>
+                    <input style="height:6vh;border-color:#ef9f10;border-radius:15px" class="form-control" asp-for="@Model.BookName">
+                    <span asp-validation-for="@Model.BookName" class="form-text text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="@Model.Price" class="form-label fw-bold"></label>
+                    <input asp-for="@Model.Price" style="height:6vh;border-color:#ef9f10;border-radius:15px" class="form-control">
+                    <span asp-validation-for="@Model.Price" class="form-text text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="@Model.Description" class="form-label fw-bold"></label>
+                    <textarea class="form-control" asp-for="@Model.Description" rows="3" style="border-color:#ef9f10;border-radius:15px"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="@Model.GenreId" class="form-label fw-bold"></label>
+                    <select asp-for="@Model.GenreId" class="form-select " asp-items="Genres" style="height:6vh;border-color:#ef9f10;border-radius:15px">
+                        <option value="0">Choose Genre...</option>
+                    </select>
+                    <span asp-validation-for="@Model.GenreId" class="form-text text-danger"></span>
+                </div>
+
+
+                <div class="mb-3">
+                    <label asp-for="@Model.AuthorId" class="form-label fw-bold"></label>
+                    <select asp-for="@Model.AuthorId" class="form-select " asp-items="Authors" style="height:6vh;border-color:#ef9f10;border-radius:15px">
+                        <option value="0">Choose Author...</option>
+                    </select>
+                    <span asp-validation-for="@Model.AuthorId" class="form-text text-danger"></span>
+                </div>
+
+            </div>
+
+            <div class="col-md-6 px-3">
+                
+                <div class="mb-3">
+                    <label asp-for="@Model.Quantity" class="form-label fw-bold">Stock Quantity</label>
+                    <input style="height:6vh;border-color:#ef9f10;border-radius:15px" asp-for="@Model.Quantity" class="form-control">
+                </div>
+
+                
+                <div class="row mb-3 justify-content-around border border-2 p-1 border-warning  text-center">
+                    <div class="col-md-6 ">
+                        <img src="@(Model.ImagePath == null? "http://books.google.com/books/content?id=x9NDbpRYu50C&printsec=frontcover&img=1&zoom=1&source=gbs_api" : Model.ImagePath)" id="bookImage" alt="BookImage" class="img-fluid w-100" />
+                    </div>
+                    <div class="col-md-4 py-5 align-self-center">
+                        <label for="bookimg" class="w-100 h1 py-3" style="color:#ef9f10;cursor:pointer;border:2px solid #ef9f10"><i class="fa-solid fa-file-circle-plus"></i>Upload book img</label>
+                        <input asp-for="@Model.BookImageFile" type="file" hidden id="bookimg"/>
+                    </div>
+                </div>
+
+
+                <div class="mb-3">
+                    <input type="submit" class="btn btncol text-white fw-bold w-100 py-2 my-2" style="font-size:25px;border-radius:15px;" value="@(Model.Id == null ? "Add new Book" : "save changes")" />
+                </div>
+                 
+
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+@section Scripts {
+    <script>
+        document.getElementById("bookimg").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById("bookImage").src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+    <partial name="_ValidationScriptsPartial.cshtml" />
+}
