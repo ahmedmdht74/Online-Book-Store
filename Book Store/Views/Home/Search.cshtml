@@ -48,7 +48,7 @@
     <div class="col-md-12 row m-0 p-4">
         
         @* // Left Side *@
-        <div class="col-md-3 p-2 position-sticky vh-100 top-0 overflow-auto">
+        <div class="col-md-3 p-2 position-sticky vh-100 top-0 overflow-auto d-md-inline d-none">
             
             @if (Model.PotentialAuthors.Count > 0)
                 {
@@ -80,7 +80,7 @@
 
 
         @* // Right Side *@
-        <div class="col-md-9 m-0 row  px-2">
+        <div class="col-md-9 m-0 row  px-2 ">
 
             @foreach(var item in Model.Books)
             {

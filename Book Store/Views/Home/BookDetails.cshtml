@@ -90,7 +90,7 @@
 
             </div>
 
-            <div class="col-6 row m-0 text-center align-self-center p-3 rounded d-flex align-items-center">
+            <div class="col-md-6 row m-0 text-center align-self-center p-3 rounded d-flex align-items-center">
                 <div class="col-7 text-end">
                     <button id="addToCartBtn" class="btn text-white btncol px-5 py-3" style="border-radius:15px;font-weight:bold">Add to Cart</button>
                 </div>
@@ -103,8 +103,8 @@
                 </div>
             </div>
 
-            <div class="col-1 text-center p-2 bg-secondary border border-5 align-self-center" >
-                <label class="heart-checkbox  w-100 h-100">
+            <div class="col-md-1 text-center text-center p-2 bg-secondary border border-5 align-self-center" >
+                <label class="heart-checkbox ">
                     <input type="checkbox" id="heartCheckbox" @(isfav ? "checked=\"checked\"" : "") data-item-id="@Model.MainBook.Id">
                     <span class="heart"></span>
                 </label>
@@ -118,10 +118,10 @@
     @* // Third Part *@
     <div class="col-md-12 row m-0 mb-3 border-top pt-5">
 
-        <div class="col-md-1 text-center">
+        <div class="col-md-1 col-3 text-center">
             <img src="/images/bookicon.png" alt="icon" class=" w-75 img-thumbnail" />
         </div>
-        <div class="col-md-3 m-0 p-0">
+        <div class="col-md-3 col-9 align-content-center m-0 p-0">
             <p class="h1"> Related Books</p>
         </div>
 
@@ -160,10 +160,10 @@
     @* // Forth Part *@
     <div class="col-md-12 row m-0 mb-5 border-top pt-5">
 
-        <div class="col-md-1 text-center">
+        <div class="col-md-1 col-3 text-center">
             <img src="/images/bookicon.png" alt="icon" class=" w-75 img-thumbnail" />
         </div>
-        <div class="col-md-3 m-0 p-0">
+        <div class="col-md-3 col-9 align-content-center m-0 p-0">
             <p class="h1">Top Comments</p>
         </div>
 
