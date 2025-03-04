@@ -528,7 +528,9 @@ namespace Book_Store.Repository
 
             User.PhoneNumber = model.Phone;
             User.Email =  new MailAddress(model.Email).User;
+            User.NormalizedEmail = new MailAddress(model.Email).User.ToUpper();
             User.UserName =  new MailAddress(model.Email).User;
+            User.NormalizedUserName = new MailAddress(model.Email).User.ToUpper();
             User.FirstName= model.Firstname;
             User.LastName = model.Lastname;
             await _context.SaveChangesAsync();

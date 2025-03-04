@@ -1567,7 +1567,9 @@ namespace Book_Store.Repository
             var User = await _userManager.FindByIdAsync(UserId);
             User.PhoneNumber = Phone;
             User.Email = new MailAddress(Email).User;
+            User.NormalizedEmail = new MailAddress(Email).User.ToUpper();
             User.UserName = new MailAddress(Email).User;
+            User.NormalizedUserName = new MailAddress(Email).User.ToUpper();
             User.FirstName = Firstname;
             User.LastName =  Lastname;
             await _context.SaveChangesAsync();
