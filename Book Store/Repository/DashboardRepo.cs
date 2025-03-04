@@ -883,20 +883,19 @@ namespace Book_Store.Repository
         public async Task<OrderListVM> GetOrderListDataAsync(string? searchtext, int? orderby, int currentpage, int status, string method)
         {
             var model = new OrderListVM();
-
             if(!_cache.TryGetValue("OrderList",out List<OrderDetailInOrderList> Orders))
             {
-                var StatusList = await _context.orderStatuses.ToDictionaryAsync(a => a.Id, a => a.Name);
-                Orders = await _context.Orders.AsNoTracking().Include(x => x.OrderDetails).OrderByDescending(x => x.CreatedDate).Select(a => new OrderDetailInOrderList
+                var OrderList = await _context.Orders.AsNoTracking().Include(x => x.OrderDetails).Include(x => x.OrderStatus).OrderByDescending(x => x.CreatedDate).ToListAsync();
+                Orders = OrderList.Select(a => new OrderDetailInOrderList
                 {
                     OrderId = a.Id,
                     Customer = a.Firstname.ToLower() + " " +a.Lastname.ToLower(),
                     PaymentMethod = a.PaymentMethod.ToLower(),
                     TotalAmount = a.OrderDetails.Sum(x => x.Quantity * x.Price) + (decimal)a.DeliveryFee.Value,
                     OrderDate = a.CreatedDate.ToString("MMM dd, yyyy"),
-                    OrderStatus = StatusList[a.StatusId],
+                    OrderStatus = a.OrderStatus.Name,
                     OrderStatusId = a.StatusId
-                }).ToListAsync();
+                }).ToList();
 
                 var CacheOptions = new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60),SlidingExpiration =  TimeSpan.FromMinutes(30) };
                 _cache.Set("OrderList", Orders, CacheOptions);
