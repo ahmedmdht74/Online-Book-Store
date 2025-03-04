@@ -189,8 +189,8 @@ namespace Book_Store.Repository
             {
                 var BookSold = await _context.OrderDetails.AsNoTracking().Include(x => x.Order).Where(x => x.Order.StatusId < 5)
                                                       .GroupBy(x => x.BookId).ToDictionaryAsync(x => x.Key, x => x.Sum(z => z.Quantity));
-
-                Books = await _context.Books.AsNoTracking().Include(g => g.Genre).Include(b => b.Author).Include(s => s.Stock).Select(a => new BookDetailInBookList
+                var AllBooks = await _context.Books.AsNoTracking().Include(g => g.Genre).Include(b => b.Author).Include(s => s.Stock).ToListAsync();
+                Books = AllBooks.Select(a => new BookDetailInBookList
                 {
                     BookId = a.Id,
                     BookName = a.Name,
@@ -201,7 +201,7 @@ namespace Book_Store.Repository
                     Sold = BookSold.ContainsKey(a.Id) ? BookSold[a.Id] : 0,
                     CoverImageUrl = a.ImagePath,
                     Description = a.Description
-                }).ToListAsync();
+                }).ToList();
 
                 var cacheOptions = new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(40), SlidingExpiration = TimeSpan.FromMinutes(20) };
                 _cache.Set("BookList", Books, cacheOptions);
@@ -503,18 +503,21 @@ namespace Book_Store.Repository
 
             if (!_cache.TryGetValue("GenreList", out List<GenreDetailInGenreList> Genres))
             {
-                var GenreSalesList = await _context.OrderDetails.AsNoTracking().Include(x => x.Book).ThenInclude(b => b.Genre)
+                var GenreSalesList = await _context.OrderDetails.AsNoTracking().Include(x => x.Book)
                                                .GroupBy(x => x.Book.GenreId).ToDictionaryAsync(a => a.Key, a => (a.Sum(x => x.Quantity * x.Price), a.Sum(x => x.Quantity)));
 
-                Genres = await _context.Genres.AsNoTracking().Include(x => x.Books)
+                GenreSalesList.Add(0, (0, 0));
+
+                var GenreList = await _context.Genres.AsNoTracking().Include(x => x.Books).ToListAsync();
+                Genres = GenreList
                      .Select(a => new GenreDetailInGenreList
                      {
                          GenreId = a.Id,
                          GenreName = a.Name.ToLower(),
                          NumOfBooks = a.Books.Count(),
-                         SoldBook = GenreSalesList.ContainsKey(a.Id) ? GenreSalesList[a.Id].Item2 : 0,
                          Totalsales = GenreSalesList.ContainsKey(a.Id) ? GenreSalesList[a.Id].Item1 : 0,
-                     }).ToListAsync();
+                         SoldBook = GenreSalesList.ContainsKey(a.Id) ? GenreSalesList[a.Id].Item2 : 0,
+                     }).ToList();
 
                 var cacheOptions = new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(40), SlidingExpiration = TimeSpan.FromMinutes(20) };
                 _cache.Set("GenreList", Genres, cacheOptions);
