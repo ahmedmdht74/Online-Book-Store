@@ -184,73 +184,82 @@ namespace Book_Store.Repository
         public async Task<BookListVM> GetBookListDataAsync(string searchtext, int? orderby, int currentpage)
         {
             var model = new BookListVM();
+            Stopwatch getquery = new Stopwatch();
+            getquery.Start();
+            var BookSold = await _context.OrderDetails.AsNoTracking().Include(x => x.Order).Where(x => x.Order.StatusId < 5)
+                                                  .GroupBy(x => x.BookId).ToDictionaryAsync(x => x.Key, x => x.Sum(z => z.Quantity));
 
-            if (!_cache.TryGetValue("BookList", out List<BookDetailInBookList> Books))
+            var Books = _context.Books.AsNoTracking().Include(g => g.Genre).Include(b => b.Author).Include(s => s.Stock).Select(a => new BookDetailInBookList
             {
-                var BookSold = await _context.OrderDetails.AsNoTracking().Include(x => x.Order).Where(x => x.Order.StatusId < 5)
-                                                      .GroupBy(x => x.BookId).ToDictionaryAsync(x => x.Key, x => x.Sum(z => z.Quantity));
-                var AllBooks = await _context.Books.AsNoTracking().Include(g => g.Genre).Include(b => b.Author).Include(s => s.Stock).ToListAsync();
-                Books = AllBooks.Select(a => new BookDetailInBookList
-                {
-                    BookId = a.Id,
-                    BookName = a.Name,
-                    Author = a.Author.Name,
-                    Genre = a.Genre.Name,
-                    Price = a.Price,
-                    Stock = a.Stock.Quantity,
-                    Sold = BookSold.ContainsKey(a.Id) ? BookSold[a.Id] : 0,
-                    CoverImageUrl = a.ImagePath,
-                    Description = a.Description
-                }).ToList();
+                BookId = a.Id,
+                BookName = a.Name,
+                Author = a.Author.Name,
+                Genre = a.Genre.Name,
+                Price = a.Price,
+                Stock = a.Stock.Quantity,
+                Sold = BookSold.ContainsKey(a.Id) ? BookSold[a.Id] : 0,
+                CoverImageUrl = a.ImagePath,
+                Description = a.Description
+            });
+            getquery.Stop();
 
-                var cacheOptions = new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(40), SlidingExpiration = TimeSpan.FromMinutes(20) };
-                _cache.Set("BookList", Books, cacheOptions);
-            }
-
-
+            Stopwatch search = new Stopwatch();
+            search.Start();
             //Search
             if (!string.IsNullOrEmpty(searchtext))
             {
                 searchtext = searchtext.Trim().ToLower();
-                Books = Books.Where(x => x.BookName.ToLower().Contains(searchtext) || x.Author.ToLower().Contains(searchtext) || x.Genre.ToLower().Contains(searchtext)).ToList();
+                Books = Books.Where(x => EF.Functions.Like(x.BookName, $"%{searchtext}%") || EF.Functions.Like(x.Author, $"%{searchtext}%") || EF.Functions.Like(x.Genre, $"%{searchtext}%"));
             }
             model.searchtext = searchtext;
+            search.Stop();
 
+            Stopwatch order = new Stopwatch();
+            order.Start();
             //Order by
             switch (orderby)
             {
                 case 1:
-                    Books = Books.OrderBy(x => x.BookName).ToList();
+                    Books = Books.OrderBy(x => x.BookName);
                     model.orderby = 1;
                     break;
                 case 2:
-                    Books = Books.OrderBy(x => x.Author).ToList();
+                    Books = Books.OrderBy(x => x.Author);
                     model.orderby = 2;
                     break;
                 case 3:
-                    Books = Books.OrderBy(x => x.Genre).ToList();
+                    Books = Books.OrderBy(x => x.Genre);
                     model.orderby = 3;
                     break;
                 case 4:
-                    Books = Books.OrderBy(x => x.Price).ToList();
+                    Books = Books.OrderBy(x => x.Price);
                     model.orderby = 4;
                     break;
                 case 5:
-                    Books = Books.OrderBy(x => x.Stock).ToList();
+                    Books = Books.OrderBy(x => x.Stock);
                     model.orderby = 5;
                     break;
                 case 6:
-                    Books = Books.OrderByDescending(x => x.Sold).ToList();
+                    Books = Books.OrderByDescending(x => x.Sold);
                     model.orderby = 6;
                     break;
             }
+            order.Stop();
 
+            Stopwatch pagination = new Stopwatch();
+            pagination.Start();
             //Pagination
             model.CurrentPage = currentpage;
             model.PageSize = 20;
             model.BookCount = Books.Count();
             model.TotalPages = (int)Math.Ceiling((decimal)model.BookCount / model.PageSize);
             model.bookDetailInBookLists = Books.Skip((model.CurrentPage - 1) * model.PageSize).Take(model.PageSize).ToList();
+            pagination.Stop();
+
+            Console.WriteLine("Get Data =====>" + getquery.ElapsedMilliseconds);
+            Console.WriteLine("Search =====>" + search.ElapsedMilliseconds);
+            Console.WriteLine("Order =====>" + order.ElapsedMilliseconds);
+            Console.WriteLine("Pagination =====>" + pagination.ElapsedMilliseconds);
 
             return model;
         }
