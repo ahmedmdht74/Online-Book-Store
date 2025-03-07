@@ -21,7 +21,7 @@ namespace Book_Store
 
             //Register AppDbContext
             builder.Services.AddDbContext<AppDbContext>(op => op.UseSqlServer(
-                builder.Configuration.GetConnectionString("conn")
+                builder.Configuration.GetConnectionString("monsterconn")
                 ));
 
 
