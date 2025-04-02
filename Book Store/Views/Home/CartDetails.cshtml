@@ -1,0 +1,89 @@
+﻿@model CartDetailsVM
+@{
+    ViewData["Title"] = "CartDetails";
+}
+
+
+<div class="px-5 row m-0">
+    @* // First Section *@
+    <div id="book-list" class="col-md-12 row m-0 justify-content-around">
+
+        <div class="col-md-12 border-top p-3">
+            <p class="h1"> Your Cart</p>
+        </div>
+
+
+    </div>
+
+
+
+
+
+    @* // Second Section *@
+    <div class="col-md-12 row m-0 my-4 border border-3 justify-content-around">
+
+        <div class="col-md-12 border-top p-3">
+            <p class="h1 text-decoration-underline">Order Summary</p>
+        </div>
+
+        <div class="col-md-12 row m-0 justify-content-between">
+            <div class="col-md-2 h4">
+                sub total
+            </div>
+            <div id="subtotal" class="col-md-2 text-end h4">
+            </div>
+        </div>
+
+        <div class="col-md-12 row m-0 justify-content-between">
+            <div class="col-md-2 h4">
+                Discount
+            </div>
+            <div class="col-md-2 text-end h4">
+                -@Model.Discount
+            </div>
+        </div>
+
+        <div class="col-md-12 row m-0 justify-content-between">
+            <div class="col-md-2 h2">
+                Total :
+            </div>
+            <div id="total" class="col-md-2 text-end h2">
+            </div>
+        </div>
+
+        <div class="col-md-12 text-center mb-5 mt-3">
+            <a asp-action="CheckOut" asp-controller="Home"
+               class="btn btncol w-75 text-white fw-bold disabled"
+               id="checkout-btn" style="font-size:25px">Proceed to Checkout</a>
+        </div>
+
+    </div>
+
+
+
+
+    @* // Forth Part Tasts *@
+    <div id="toastContainer" class="position-fixed  bottom-0 w-25 h-25 start-0 p-3" style="z-index: 1050;">
+        <div id="toastSuccess" class="toast btncol text-white  border-dark border-3 " role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header btncol text-white">
+                <strong class="me-auto h5">Success</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body h6" id="toastSuccessMessage">Item added to cart successfully!</div>
+        </div>
+
+        <div id="toastError" class="toast bg-danger text-white  border-dark border-3 " role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-danger text-white">
+                <strong class="me-auto h5">Error</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body h6" id="toastErrorMessage">Failed to add item to cart.</div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script src="/js/cartdetails.js" asp-append-version="true"></script>
+}

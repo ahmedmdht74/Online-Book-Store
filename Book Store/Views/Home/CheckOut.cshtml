@@ -1,0 +1,226 @@
+﻿@model CheckoutVM
+@{
+    ViewData["Title"] = "CheckOut";
+    var States = new SelectList(Model.States , "Id","Name");
+}
+
+
+
+<div class="mx-5 row m-0">
+
+    
+
+
+    @* // First Section *@
+    <div class="col-md-12 py-1 ">
+        <p class="h6"><a asp-action="CartDetails" asp-controller="Home" class="text-muted text-decoration-none"><i class="fa-solid fa-arrow-left me-2"></i> Bach to cart</a></p>
+    </div>
+
+    <div class="col-md-12 m-0 row py-1 ">
+
+        @* // Left Side *@
+        <div class="col-md-7 p-2">
+            <p class="h2 w-100">Chechout</p>
+
+            <form method="post" asp-action="MakeOrder" asp-controller="Home" class="w-100 row pt-2 border-top border-bottom border-2">
+                <p class="h3 w-100 py-1">Contact Info</p>
+
+                <div class="col-md-12 row m-0 p-0 pb-3 border-bottom border-2">
+                    <div class=" col-md-6 px-4">
+                        <label asp-for="@Model.Firstname" class="form-label fw-bold"></label>
+                        <input asp-for="@Model.Firstname" class="form-control" style="height:6vh;border-color:#ef9f10;border-radius:15px"/>
+                        <span asp-validation-for="@Model.Firstname" class="form-text text-danger"></span>
+                    </div>
+
+                    <div class=" col-md-6 px-4">
+                        <label asp-for="@Model.Lastname" class="form-label fw-bold"></label>
+                        <input asp-for="@Model.Lastname" class="form-control" style="height:6vh;border-color:#ef9f10;border-radius:15px"/>
+                        <span asp-validation-for="@Model.Lastname" class="form-text text-danger"></span>
+                    </div>
+
+                    <div class=" col-md-6 px-4">
+                        <label asp-for="@Model.Phone" class="form-label fw-bold"></label>
+                        <input asp-for="@Model.Phone" class="form-control" style="height:6vh;border-color:#ef9f10;border-radius:15px"/>
+                        <span asp-validation-for="@Model.Phone" class="form-text text-danger"></span>
+                    </div>
+
+                    <div class=" col-md-6 px-4">
+                        <label asp-for="@Model.Email" class="form-label fw-bold"></label>
+                        <input asp-for="@Model.Email"  class="form-control" style="height:6vh;border-color:#ef9f10;border-radius:15px" value="@Model.Email"/>
+                        <span asp-validation-for="@Model.Email" class="form-text text-danger"></span>
+                    </div>
+                </div>
+
+
+                <div class="col-md-12 row m-0 p-0 pb-2 border-bottom border-2">
+                    <p class="h3 w-100 py-2">Where shoukd we send it?</p>
+
+                    <div class=" col-md-6 px-4">
+                        <label class="form-label fw-bold">State</label>
+                        <select class="form-select " id="stateDropdown" asp-items="States" style="height:6vh;border-color:#ef9f10;border-radius:15px">
+                            <option selected>Open this select menu</option>
+                        </select>
+                        <span class="form-text text-danger"></span>
+                    </div>
+
+
+                    <div class=" col-md-6 px-4">
+                        <label class="form-label fw-bold" asp-for="@Model.CityId"></label>
+                        <select class="form-select" asp-for="@Model.CityId" id="cityDropdown" style="height:6vh;border-color:#ef9f10;border-radius:15px">
+                            <option selected disabled value="0">Open this select menu</option>
+                        </select>
+                        <span asp-validation-for="@Model.CityId" class="form-text text-danger"></span>
+                    </div>
+
+
+
+                    <div class=" col-md-12 pt-2">
+                        <div class="">
+                            <label asp-for="@Model.Address" class="form-label fw-bold"></label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="height:6vh;border-color:#ef9f10;border-radius:15px"><i class="fa-solid fa-location-dot mx-2"></i></span>
+                                <input asp-for="@Model.Address" class="form-control" placeholder="Enter your delivery address...." style="height:6vh;border-color:#ef9f10;border-radius:15px">
+                            </div>
+                            <span asp-validation-for="@Model.Address" class="form-text text-danger"></span>
+                        </div>
+                    </div>
+
+
+                    <div class=" col-md-12 p-2">
+                        <div class=" mb-3">
+                            <label asp-for="@Model.AdditionNotice" class="form-label fw-bold"><small class="text-muted fw-normal">optional</small></label>
+                            <textarea asp-for="@Model.AdditionNotice" class="form-control" style="border-color:#ef9f10;border-radius:15px" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-12 row m-0 p-0 pb-3 border-bottom border-2">
+                    <p class="h3 w-100 pt-2">How do you want to pay?</p>
+
+                    <div class="form-checkcol-md-12 py-1">
+                        <input asp-for="@Model.PaymentMethod" class="form-check-aa" type="radio" name="PaymentMethod" id="11" value="online">
+                        <label class="fw-bold form-check-label" for="11">
+                            Online Payment
+                        </label>
+                    </div>
+
+
+                    <div class="form-checkcol-md-12 py-1">
+                        <input asp-for="@Model.PaymentMethod" class="form-check-aa" type="radio" name="PaymentMethod" id="22" value="cash">
+                        <label class="fw-bold form-check-label" for="22">
+                            Cash on Delivery
+                        </label>
+                    </div>
+
+
+                    <div class="form-checkcol-md-12 py-1">
+                        <input asp-for="@Model.PaymentMethod" class="form-check-aa" type="radio" name="PaymentMethod" id="33" value="credit">
+                        <label class="fw-bold form-check-label" for="33">
+                            Pay with Credit/Debit Card
+                        </label>
+                    </div>
+                    <span asp-validation-for="@Model.PaymentMethod" class="form-text text-danger"></span>
+
+
+                    <input hidden asp-for="@Model.DeliveryFee" value="@Model.DeliveryFee" />
+                    <div class="col-md-12 my-2">
+                        <input type="submit" class="btn btncol text-white fw-bold w-100 py-2 my-2" style="font-size:25px;border-radius:15px;" value="Confirm Order"/>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+
+
+
+        @* // Right Side *@
+        <div class="col-md-5">
+
+            <div class="row jsutify-content-between mb-3" style="border:3px solid #ef9f10;">
+                <span class="h2 col p-2 ms-3">@Model.CartItems Item</span>
+                <span class="h2 col text-end p-2 me-3">Cart</span>
+                <span class="border w-100 border-top border-2"></span>
+
+                @foreach (var book in Model.CartBookDetails)
+                {
+                    <div class="col-12 row m-0 my-1" >
+                        <div class="col-3">
+                            <img src="@book.BookImage" alt="book1" class="img-fluid p-3 card-img-top" />
+                        </div>
+                        <div class="col-8">
+                            <p class="h5 mt-3">
+                                @book.BookName
+                            </p>
+                            <p class="h5 mt-1">
+                                Price: <span class=" fw-normal">@book.Price E£</span>
+                            </p>
+                            <p class="h5 mt-1">
+                                Qty: <span class=" fw-normal"> @book.Quantity </span>
+                            </p>
+                        </div>
+                    </div>
+                }
+
+            </div>
+
+
+            <div class="row w-75 mx-auto jsutify-content-between " style="border:3px solid #ef9f10;">
+                <span class="h2 col p-2 ms-3 text-decoration-underline">Order Summary</span>
+
+                <p class="h4 mt-1">
+                    Subtotal: <span class=" fw-normal">@Model.Subtotal.00 E£</span>
+                </p>
+                <p class="h4 mt-1">
+                    Discount: - <span class=" fw-normal"> @Model.Discount E£ </span>
+                </p>
+                <p class="h4 mt-1">
+                    Delivery Fee : <span class=" fw-normal">@Model.DeliveryFee E£</span>
+                </p>
+                <span class="border my-3 w-75 mx-auto border-top border-2"></span>
+
+                <p class="h4 mt-1 p-2">
+                    Total Amount Due: <span class=" fw-normal"> @Model.TotalAmountDue E£ </span>
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+
+
+</div>
+
+
+
+
+
+@section Scripts{
+    <script>
+            $(document).ready(function () {
+            $("#stateDropdown").change(function () {
+                let stateId = $(this).val(); 
+
+                if (!stateId) return;
+
+                $.ajax({
+                    url: `/Home/GetCitiesByState?stateId=${stateId}`,
+                    type: "GET",
+                    success: function (response) {
+                        let cityDropdown = $("#cityDropdown");
+                        cityDropdown.empty(); 
+                        cityDropdown.append('<option selected disabled>Select a city</option>');
+
+                        $.each(response, function (index, city) {
+                            cityDropdown.append(`<option value="${city.id}">${city.name}</option>`);
+                        });
+                    },
+                    error: function () {
+                        console.error("Failed to fetch cities.");
+                    }
+                });
+            });
+        });
+    </script>
+    <partial name="_ValidationScriptsPartial.cshtml" />
+}

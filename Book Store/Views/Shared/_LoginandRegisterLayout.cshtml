@@ -1,0 +1,50 @@
+﻿@{
+    Layout = "_Layout";
+    Console.WriteLine(Url.Action());
+
+}
+
+
+<div class="mx-5 row m-0">
+
+
+
+    <div class="col-md-12 mb-4 py-5" style="background-color:#F2E5CE">
+        <div class="row justify-content-center  my-5 py-5">
+            <div class="col col-md-6 p-5 ">
+                <div class=" row h-100 bg-white border border-5 border-black">
+
+
+                    <div class="col-6 py-2 text-center @(Url.Action() == "/Account/Login"? "bg-light":"")">
+                        <a asp-action="Login" asp-controller="Account" class="btn " style="font-weight:bold;color:black">Log in</a>
+                    </div>
+
+                    <div class="col-6 py-2 text-center @(Url.Action() == "/Account/Register"? "bg-light":"")">
+                        <a asp-action="Register" asp-controller="Account" class="btn " style="font-weight:bold;color:black">Sign up</a>
+                    </div>
+
+                    <div class="col-12  border-top border-5 border-black align-content-center">
+
+                        @RenderBody()
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial.cshtml" />
+}
+
+
+
+
+

@@ -1,0 +1,219 @@
+﻿@model StateListVM
+@{
+    ViewData["Title"] = "State List";
+    ViewData["action"] = "StateList";
+    ViewData["pagename"] = "StateList";
+
+    Layout = "/Views/Shared/_DashboardLayout.cshtml";
+}
+
+
+
+
+@* // First section *@
+<div class="row justify-content-between mt-2">
+    <div class="col-5 ">
+        <p class="h2 fw-bold">States</p>
+    </div>
+
+
+    <div class="col text-end">
+        <!--Add State Button-->
+        <button type="button" class="btn btncol fw-bold text-white mt-3" data-bs-toggle="modal" data-bs-target="#AddStateModal">
+            Add State
+        </button>
+
+        <!-- Add State Modal -->
+        <div class="modal fade" id="AddStateModal" tabindex="-1" aria-labelledby="AddStateModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <form method="post" asp-action="AddState" asp-controller="Dashboard" class="w-100">
+                    <div class="modal-content text-start">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="AddStateModalLabel">Add State</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-start">
+                            <div class="mb-3">
+                                <label asp-for="@Model.ModalStateInput" class="form-label fw-bold"></label>
+                                <input asp-for="@Model.ModalStateInput" style="height:6vh;border-color:#ef9f10;border-radius:15px" class="form-control">
+                                <span asp-validation-for="@Model.ModalStateInput" class="form-text text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btncol text-white">Add</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@* // Second section *@
+<div class="row mt-4 justify-content-around">
+    <div class="col-md-10 mx-auto">
+        <form class="" method="get" asp-action="StateList" asp-controller="Dashboard">
+            <div class="input-group">
+                <button type="submit" asp-route-orderby="@Model.orderby" class="input-group-text" id="basic-addon1"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <input class="form-control" name="searchtext" value="@Model.searchtext" placeholder="Search by state name" style="height:6vh">
+            </div>
+        </form>
+    </div>
+    <div class="col-md-2  mx-auto align-self-center"><span class="h4">Count : @Model.StateCount</span> </div>
+</div>
+
+
+
+
+
+
+@* // Third section *@
+<div class="row mt-3 justify-content-end">
+    <div class="col-12">
+        <table class="table table-secondary">
+            <thead class="">
+                <tr class="text-center">
+                    <th style="border-radius:20px 0 0 0 "><a class="text-decoration-none text-dark" asp-action="StateList" asp-controller="Dashboard" asp-route-orderby="1" asp-route-searchtext="@Model.searchtext"> State no. </a></th>
+                    <th><a class="text-decoration-none text-dark" asp-action="StateList" asp-controller="Dashboard" asp-route-orderby="2" asp-route-searchtext="@Model.searchtext"> Name </a></th>
+                    <th><a class="text-decoration-none text-dark" asp-action="StateList" asp-controller="Dashboard" asp-route-orderby="3" asp-route-searchtext="@Model.searchtext"> Num of Cities </a></th>
+                    <th><a class="text-decoration-none text-dark" asp-action="StateList" asp-controller="Dashboard" asp-route-orderby="4" asp-route-searchtext="@Model.searchtext"> Num of Deliveries </a></th>
+                    <th style="border-radius:0 20px 0 0 ">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var state in Model.StateDetailInStateLists)
+                {
+                    <tr class="text-center">
+                        <td class="py-2 pb-0">@state.ID</td>
+                        <td class="py-2 pb-0">@state.Name</td>
+                        <td class="py-2 pb-0">
+                            <button type="button" class="btn btn-primary my-2" data-bs-toggle="modal" data-bs-target="#ShowCitiesModal_@state.ID">
+                                <i class="fa-solid fa-eye"></i> @state.CityNumbers
+                            </button>
+                            <div class="modal fade" id="ShowCitiesModal_@state.ID" tabindex="-1" aria-labelledby="ShowCitiesLabel_@state.ID" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="ShowCitiesLabel_@state.ID">All Cities...</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row justify-content-around">
+                                                @foreach (var city in state.Cities)
+                                                {
+                                                    <div class="col-4 text-center">
+                                                        <p class="shadow p-2">@city.Name</p>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-2 pb-0">@state.AllDeliveryNumber</td>
+                        <td class="py-2 pb-0">
+                            <!-- Edit State Button -->
+                            <button type="button" class="btn btn-primary my-2" data-bs-toggle="modal" data-bs-target="#EditStateModal_@state.ID">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+
+                            <!-- Edit State Modal -->
+                            <div class="modal fade" id="EditStateModal_@state.ID" tabindex="-1" aria-labelledby="EditStateModalLabel_@state.ID" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <form method="post" asp-action="EditState" asp-controller="Dashboard" class="w-100">
+                                        <input hidden name="StateId" value="@state.ID" />
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="EditStateModalLabel_@state.ID">Edit State</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label asp-for="@Model.ModalStateInput" class="form-label fw-bold"></label>
+                                                    <input asp-for="@Model.ModalStateInput" style="height:6vh;border-color:#ef9f10;border-radius:15px" value="@state.Name" class="form-control">
+                                                    <span asp-validation-for="@Model.ModalStateInput" class="form-text text-danger"></span>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btncol text-white">Update</button>
+                                            </div>
+                                        </div>
+
+                                    </form>
+                                </div>
+                            </div>
+
+
+                            <!-- Delete State Button -->
+                            <button type="button" class="btn btn-danger my-2" data-bs-toggle="modal" data-bs-target="#DeleteStateModal_@state.ID">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+
+                            <!-- Delete State Modal -->
+                            <div class="modal fade" id="DeleteStateModal_@state.ID" tabindex="-1" aria-labelledby="DeleteStateModalLabel_@state.ID" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <form method="post" asp-action="DeleteState" asp-controller="Dashboard" class="w-100">
+                                        <input hidden name="StateId" value="@state.ID" />
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="DeleteStateModalLabel_@state.ID">Delete Role ==> {@state.Name}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-danger text-white">Delete</button>
+                                            </div>
+                                        </div>
+
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+
+@* // Forth section *@
+<div class="row mt-3 border-top border-3">
+    <div class="col-md-12">
+        <p class="h2 fw-bold text-decoration-underline">Bulk Upload</p>
+        <p class="h4 ">Upload State in bluk with an Excel file. Each row in the file should include the following columns: StateId ,Name ,Num of Cities ,Num of Deliveries </p>
+    </div>
+    <div class="col-md-12 mt-2">
+        <form class="w-100" method="post" asp-action="GetStatesExcelFile" asp-controller="Dashboard">
+            <input hidden name="searchtext" value="@Model.searchtext" />
+            <input hidden name="orderby" value="@Model.orderby" />
+            <input type="submit" class="btn btncol fw-bold text-white px-3 py-2 w-50" value="upload excel file" />
+        </form>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial.cshtml" />
+}

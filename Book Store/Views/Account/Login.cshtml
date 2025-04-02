@@ -1,0 +1,36 @@
+﻿@model LoginVM
+
+@{
+    ViewData["Title"] = "Login";
+    Layout = "/Views/Shared/_LoginandRegisterLayout.cshtml";
+}
+
+
+
+<form method="post" class=" p-4" asp-route-returnURL="@Model.returnURL">
+    @{
+        if (TempData["res"] != null)
+        {
+            if ((bool)TempData["res"] == true)
+            {
+                <div asp-validation-summary="All" class="text-danger">
+                </div>
+            }
+        }
+    }
+    <div class="">
+        <input asp-for="@Model.Email" placeholder="Username" class="form-control" style="height:7vh;border-radius:10px">
+        <span asp-validation-for="@Model.Email" class="form-text text-danger"></span>
+    </div>
+    <div class="mt-4 ">
+        <input asp-for="@Model.Password" placeholder="Password" class="form-control" style="height:7vh;border-radius:10px">
+        <span asp-validation-for="@Model.Password" class="form-text text-danger"></span>
+    </div>
+    <div class="mt-4" style="margin-left:25px">
+        <input asp-for="@Model.RememberMe" placeholder="Password" type="checkbox" class="form-check-input" style="border-radius:10px">
+        <label asp-for="@Model.RememberMe"></label>
+    </div>
+    <div class="mt-4 ">
+        <button type="submit" class="btn btncol w-100 text-white" style="border-radius:10px;font-weight:bold;height:7vh">Login</button>
+    </div>
+</form>

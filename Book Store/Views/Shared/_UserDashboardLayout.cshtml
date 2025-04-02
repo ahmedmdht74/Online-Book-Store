@@ -1,0 +1,112 @@
+﻿@inject UserManager<ApplicationUser> _user
+@{
+    Layout = "_Layout";
+    Console.WriteLine(Url.Action());
+    ApplicationUser user = null;
+    if (User.Identity.Name != null)
+    {
+        string username = User.Identity.Name;
+        user = await _user.FindByEmailAsync(username);
+    }
+}
+
+@RenderSection("Css",false)
+
+<div class="mx-4 mb-4 row">
+
+    @* // Left Side   ===> Navbar *@
+    <div class="col-md-3 px-4">
+
+        <div class="list-group">
+            @* // User Dashboard *@
+            <a href="/UserDashboard/UserDashboard" class="list-group-item list-group-item-action @(Url.Action() == "/UserDashboard/UserDashboard"? "text-white" : "") " style="background-color:@(Url.Action() == "/UserDashboard/UserDashboard"? "#ef9f10" : "")">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Dashboard</h5>
+                </div>
+                <p class="mb-1">Welcome to your dashboard! Here, you can track your orders, browse book recommendations, manage your wishlist</p>
+            </a>
+            
+            
+            @* // User Favorites  *@
+            <a href="/UserDashboard/UserFavorites" class="list-group-item list-group-item-action @(Url.Action() == "/UserDashboard/UserFavorites"? "text-white" : "")" style="background-color:@(Url.Action() == "/UserDashboard/UserFavorites"? "#ef9f10" : "")">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">My Wishlist</h5>
+                </div>
+                <p class="mb-1">Keep track of your favorite books, save items for later, and easily access your must-read collection anytime.</p>
+            </a>
+            
+
+            @* // User Orders  *@
+            <a href="/UserDashboard/UserOrders" class="list-group-item list-group-item-action @(Url.Action() == "/UserDashboard/UserOrders"? "text-white" : "")" style="background-color:@(Url.Action() == "/UserDashboard/UserOrders"? "#ef9f10" : "")">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">My Orders</h5>
+                </div>
+                <p class="mb-1">The Order List page lets users track past orders, view details, check status updates, and download invoices for easy record-keeping.</p>
+            </a>
+
+
+            
+            @* // User Profile   *@
+            <a href="/UserDashboard/UserProfile" class="list-group-item list-group-item-action  @(Url.Action() == "/UserDashboard/UserProfile"? "text-white" : "")" style="background-color:@(Url.Action() == "/UserDashboard/UserProfile"? "#ef9f10" : "")" ">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Personal Info</h5>
+                </div>
+                <p class="mb-1">Manage your personal details, update preferences, and customize your account for a seamless experience.</p>
+            </a>
+
+        </div>
+
+
+    </div>
+
+
+
+
+    @* // Right Side   ===> Body *@
+    <div class="col-md-9">
+
+        @* // First Section ==> Welcome *@
+        <div class="row bg-light">
+            <div class="col-md-6">
+                <p class="">
+                    <img src="@((user != null) ? user.Image == null ? "/images/default.png" : user.Image : "/images/default.png")" alt="userimg" class="img-thumbnail me-2" style="border-radius:100%;height:12vh" />
+                    <span class="h4 ">Welcome back, @(user != null ? user.FirstName : "user")!</span>
+                </p>
+            </div>
+
+            <div class="col-md-6 text-end align-content-center">
+                <span class="">
+                    <a href="/UserDashboard/UserProfile" class="text-decoration-none text-muted p-3 mx-3"><i class="fa-solid fa-user text-dark"></i> Edit Profile</a>
+                </span>
+
+                <span class="">
+                    <a href="@Url.Action("UserProfile", "UserDashboard")#ChangePassward" class="text-decoration-none text-muted p-3 mx-3"><i class="fa-solid fa-key text-dark"></i> Change Password</a>
+                </span>
+            </div>
+        </div>
+
+
+
+        @RenderBody()
+    </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial.cshtml" />
+    @RenderSection("Scripts", false)
+}
+

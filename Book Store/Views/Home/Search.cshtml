@@ -1,0 +1,123 @@
+﻿@model SearchPageVM
+
+@{
+    ViewData["Title"] = "About";
+}
+
+@section Css {
+    <style>
+        div div div a .a {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+            div div div a .a:hover {
+            }
+    </style>
+}
+
+
+<div class="px-5 row m-0">
+
+    @* // Second One *@
+
+    <div class="col-md-12 row m-0 p-4 border-bottom">
+        <div class="col-md-3">
+            <a asp-action="Landing" asp-controller="Home" class="btn bg-light">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+        </div>
+
+
+
+        <div class="col-md-9 row justify-content-between m-0">
+            <div class="col-md-9">
+                <p class="h3">Search results for "@Model.SearchText"</p>
+            </div>
+
+
+            <div class="col-md-2 text-end">
+                <p class="h4">@Model.Books.Count results</p>
+            </div>
+        </div>
+    </div>
+
+
+    @* // Third One *@
+    <div class="col-md-12 row m-0 p-4">
+        
+        @* // Left Side *@
+        <div class="col-md-3 p-2 position-sticky vh-100 top-0 overflow-auto d-md-inline d-none">
+            
+            @if (Model.PotentialAuthors.Count > 0)
+                {
+                    <button class="btn w-100 border border-2" type="button" style="background-color:white" data-bs-toggle="collapse" data-bs-target="#categoryfilter" aria-expanded="false" aria-controls="HOWBOOKSTOREWORKS">
+                        Authors <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+
+                    <ul class="list-group collapse show" id="categoryfilter">
+                    @foreach (var item in Model.PotentialAuthors)
+                    {
+                        <li class="list-group-item"><a asp-action="Search" asp-controller="Home" asp-route-searchtext="@item.Name" class="text-decoration-none text-dark">@item.Name</a></li>
+                    }
+                    </ul>
+                }
+
+            @if (Model.PotentialGenres.Count > 0){
+                <button class="btn w-100 mt-4 border border-2" type="button" style="background-color:white" data-bs-toggle="collapse" data-bs-target="#pricefilter" aria-expanded="false" aria-controls="HOWBOOKSTOREWORKS">
+                    Genres <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <ul class="list-group collapse show" id="pricefilter">
+                    @foreach (var item in Model.PotentialGenres)
+                    {
+                        <li class="list-group-item"><a asp-action="Search" asp-controller="Home" asp-route-searchtext="@item.Name" class="text-decoration-none text-dark">@item.Name</a></li>
+                    }
+                </ul>
+
+            }
+            </div>
+
+
+        @* // Right Side *@
+        <div class="col-md-9 m-0 row  px-2 ">
+
+            @foreach(var item in Model.Books)
+            {
+                <div class="col-sm-12 col-md-6 col-lg-4 p-2">
+                    <div class="card p-3" style="background-color:#D3D3D3">
+                        <a asp-action="BookDetails" asp-controller="Home" asp-route-BookId="@item.BookId" class="row justify-context-between text-dark text-decoration-none">
+                            <div class="col h5 a">@item.BookTitle</div>
+                            <div class="col  text-end">@@@item.AuthorName</div>
+                        </a>
+                        <a asp-action="BookDetails" asp-controller="Home" asp-route-BookId="@item.BookId" class="text-dark text-decoration-none">
+                            @* <img src="/images/about1.png" class="card-img-top" alt="..."> *@
+                            <img src="@(item.BookImage == null? "http://books.google.com/books/content?id=x9NDbpRYu50C&printsec=frontcover&img=1&zoom=1&source=gbs_api": item.BookImage )" class="card-img-top" alt="...">
+                            @* <img src="https://m.media-amazon.com/images/I/81BQRJOqggL._SY466_.jpg" class="card-img-top" alt="..."> *@
+                        </a>
+                        <div class="card-body row justify-content-between  p-0 m-0">
+                            <a asp-action="BookDetails" asp-controller="Home" asp-route-BookId="@item.BookId" class="col text-dark text-decoration-none">
+                                <span class="">price</span>
+                                <h5 class="">@item.Price egy</h5>
+                            </a>
+                            <a asp-action="BookDetails" asp-controller="Home" asp-route-BookId="@item.BookId" class="col text-end text-dark text-decoration-none">
+                                <span>Genre</span>
+                                <h5>@item.GenreName</h5>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            }
+
+
+
+
+        </div>
+    </div>
+
+
+
+    
+
+</div>

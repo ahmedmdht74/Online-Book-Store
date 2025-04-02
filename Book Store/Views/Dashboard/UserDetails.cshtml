@@ -1,0 +1,288 @@
+﻿@model UserDetailsVM
+@{
+    ViewData["Title"] = "User List";
+    ViewData["action"] = "UserDetails";
+    ViewData["pagename"] = "UserDetails";
+
+    Layout = "/Views/Shared/_DashboardLayout.cshtml";
+    string StatusIcon(int StatusId)
+    {
+        string icon = StatusId switch
+        {
+            1 => """fa-solid text-danger fa-circle-dot""",
+            2 => """fa-solid text-warning fa-circle-dot""",
+            3 => """fa-solid text-primary fa-truck-fast""",
+            4 => """fa-solid text-success fw-bold mt-1 fa-check border border-2 border-success px-1""",
+            5 => """fa-solid text-danger fa-xmark border border-2 border-danger px-1""",
+            6 => """fa-solid text-primary fa-rotate""",
+        };
+        return icon;
+    }
+}
+
+
+@* // First section *@
+<div class="row justify-content-between mt-2">
+    <div class="col-5 ">
+        <p class="h2 fw-bold">User Details</p>
+    </div>
+</div>
+
+
+
+@* // Second section *@
+<div class="row border-2 border">
+    <div class="col-md-1 col-4 my-0">
+        <img src="@Model.Image" alt="userimg" class="img-thumbnail" />
+    </div>
+
+    <div class="col-md-3 col-5 my-0 align-self-center">
+        <p class="h4">@Model.FullName</p>
+        <p class="text-muted">@Model.Email</p>
+    </div>
+
+    <!--Role Assign Button-->
+    <div class="col-md-8 col-2 my-0 align-self-center text-end">
+        <button type="button" data-bs-toggle="modal" data-bs-target="#RoleAssignModal" class="btn btn-primary">Role Management</button>
+    </div>
+
+    <!--Role Assign Modal-->
+    <div class="modal fade" id="RoleAssignModal" tabindex="-1" aria-labelledby="RoleAssignModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="RoleAssignModalLabel">Role Assignment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row p-3">
+
+                        @foreach (var role in Model.UserRoleInUserDetails)
+                        {
+                            <div class="col-11">
+                                <label class="h5" for="role_@role.RoleId">@role.RoleName</label>
+                            </div>
+                            <div class="col-1">
+                                <input type="checkbox"
+                                       id="role_@role.RoleId"
+                                       data-roleid="@role.RoleId"
+                                       class="role-checkbox"
+                                @(role.IsExisted ? "checked" : "") />
+                            </div>
+                        }
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+@* // Third section *@
+<div class="row border-2 border">
+    <div class="col-12 mt-2 px-2 ">
+        <p class="h5 fw-bold text-decoration-underline">Account info</p>
+    </div>
+    
+    <div class="col-md-12">
+        <form class="row p-4" asp-action="ChangeUserData" method="post" asp-controller="Dashboard">
+            <!--For Errors -->
+            <div class="col-md-12 text-center text-danger">
+            </div>
+
+            <input hidden asp-for="@Model.UserId" value="@Model.UserId" />
+            <div class="col-md-12">
+                <div class="mb-3">
+                    <label asp-for="@Model.Email" class="form-label fw-bold"></label>
+                    <input asp-for="@Model.Email" style="height:6vh;border-color:#ef9f10;border-radius:15px" class="form-control">
+                    <span asp-validation-for="@Model.Email" class="form-text text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label asp-for="@Model.Firstname" class="form-label fw-bold"></label>
+                    <input asp-for="@Model.Firstname" style="height:6vh;border-color:#ef9f10;border-radius:15px" class="form-control">
+                    <span asp-validation-for="@Model.Firstname" class="form-text text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label asp-for="@Model.Lastname" class="form-label fw-bold"></label>
+                    <input asp-for="@Model.Lastname" style="height:6vh;border-color:#ef9f10;border-radius:15px" class="form-control">
+                    <span asp-validation-for="@Model.Lastname" class="form-text text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label asp-for="@Model.Phone" class="form-label fw-bold"></label>
+                    <input asp-for="@Model.Phone" style="height:6vh;border-color:#ef9f10;border-radius:15px" class="form-control">
+                    <span asp-validation-for="@Model.Phone" class="form-text text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label asp-for="@Model.UserRoles" class="form-label fw-bold"></label>
+                    <input asp-for="@Model.UserRoles" disabled style="height:6vh;border-color:#ef9f10;border-radius:15px" class="form-control">
+                </div>
+            </div>
+            <div class="col-12 text-end">
+                <input type="submit" class="btn btncol text-white fw-bold py-2 my-2 h3" style="border-radius:15px;" value="Save Changes" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+@* // Forth section *@
+<form class="row py-3" method="post" asp-action="ResetUserPassword" asp-controller="Dashboard">
+    <input hidden asp-for="@Model.UserId" data-userid="@Model.UserId" value="@Model.UserId" />
+    <div class="col-md-2 col-12 text-center">
+        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseResetPassword" aria-expanded="false" aria-controls="collapseResetPassword">
+            Reset Password
+        </button>
+    </div>
+    <div class="col-md-10 col-12">
+        <div class="collapse show row"  id="collapseResetPassword">
+            <div class="col-md-5">
+                <input asp-for="@Model.NewPassword" style="height:6vh;border-color:#ef9f10;border-radius:15px" class="form-control " type="password" placeholder="New Password"/>
+                <span asp-validation-for="@Model.NewPassword" class="form-text text-danger"></span>
+            </div>
+            <div class="col-md-5">
+                <input asp-for="@Model.ConfirmNewPassword" style="height:6vh;border-color:#ef9f10;border-radius:15px" class="form-control " type="password" placeholder="Confirm Password" />
+                <span asp-validation-for="@Model.ConfirmNewPassword" class="form-text text-danger"></span>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btncol fw-bold text-white" style="border-radius:15px;">save</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+@* // Fivth section *@
+<div class="row">
+    <div class="col-12 mt-2 px-2 ">
+        <p class="h5 fw-bold text-decoration-underline">Manage Orders</p>
+    </div>
+
+    <div class="col-12 text-center mt-3">
+        @if(Model.UserOrders.Count() > 0){
+            <table class="table table-secondary">
+                <thead class="">
+                    <tr class="text-center">
+                        <th style="border-radius:20px 0 0 0 "> Order no.</th>
+                        <th> Customer</th>
+                        <th> Total Amount</th>
+                        <th> Payment Method</th>
+                        <th> Order Status</th>
+                        <th> Order Date</th>
+                        <th style="border-radius:0 20px 0 0 ">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model.UserOrders)
+                    {
+                        <tr class="text-center">
+                            <td class="py-2 pb-0">@order.OrderId</td>
+                            <td class="py-2 pb-0">@order.Customer</td>
+                            <td class="py-2 pb-0">@order.TotalAmount</td>
+                            <td class="py-2 pb-0"><p class="shadow py-1 fw-bold">@order.PaymentMethod</p></td>
+                            <td class="py-2 pb-0"><p class="shadow py-1"><i class="@StatusIcon(order.OrderStatusId)"></i> @order.OrderStatus</p></td>
+                            <td class="py-2 pb-0">@order.OrderDate</td>
+                            <td class="py-2 pb-0">
+                                <p><a asp-action="OrderDetails" asp-controller="Dashboard" asp-route-OrderId="@order.OrderId" class="fw-bold bg-primary rounded-pill px-3 py-2 text-decoration-none btn text-white">View Details,</a></p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else{
+            <p class="h3 p-3 shadow mx-auto">No Orders yet</p>
+        }
+    </div>
+</div>
+
+
+
+
+
+@* // Six section *@
+<div class="row">
+    <div class="col-12 mt-2 px-2 ">
+        <div class="row justify-content-between">
+            <div class="col">
+                <p class="h5 fw-bold text-decoration-underline">Favorite List</p>
+            </div>
+            <div class="col text-end">
+                <a asp-action="ClearAllUserFavorite" asp-controller="Dashboard" asp-route-UserId="@Model.UserId" class="btn @(Model.UserFav.Count() > 0 ? "" : "d-none") fw-bold btn-danger">clear all</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12 text-center mt-3">
+        @if (Model.UserFav.Count() > 0){
+            <div class="row">
+                @foreach (var book in Model.UserFav)
+                {
+                    <div class="col-md-2 text-center col-4">
+                        <a asp-action="BookDetails" asp-controller="Home" asp-route-BookId="@book.Id">
+                            <img src="@book.Image" class="img-fluid rounded-circle" />
+                        </a>
+                        <p class="h6">@book.Name</p>
+                    </div>
+                }
+            </div>
+        }
+        else{
+            <p class="h3 shadow p-3 mx-auto">No Favorite Items</p>
+        }
+    </div>
+</div>
+
+
+
+
+
+
+
+
+@section Scripts {
+    <script>
+
+        $(document).ready(function () {
+            $(".role-checkbox").change(function () {
+                var userId = $("input[data-userid]").val(); 
+                var roleId = $(this).data("roleid");
+                var isChecked = $(this).is(":checked");
+
+                $.ajax({
+                    url: '/Dashboard/AssignRoleToUser',
+                    type: 'POST',
+                    data: { userId: userId, roleId: roleId, isAssigned: isChecked },
+                    success: function (response) {
+                        if (response.success) {
+                            console.log("Role updated successfully!");
+                        } else {
+                            console.log("Error updating role:", response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log("AJAX Error:", error);
+                    }
+                });
+            });
+        });
+
+    </script>
+
+    <partial name="_ValidationScriptsPartial.cshtml" />
+}

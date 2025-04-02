@@ -1,0 +1,211 @@
+﻿@model AuthorListVM
+
+@{
+    ViewData["Title"] = "Authors List";
+    ViewData["action"] = "AuthorList";
+    ViewData["pagename"] = "AuthorList";
+
+    Layout = "/Views/Shared/_DashboardLayout.cshtml";
+    int Start = Model.CurrentPage > 1 ? Model.CurrentPage - 1 : Model.CurrentPage;
+    int End = Model.CurrentPage < Model.TotalPages ? Model.CurrentPage + 1 : Model.CurrentPage;
+}
+
+
+
+@* // First section *@
+<div class="row justify-content-between mt-2">
+    <div class="col-5 ">
+        <p class="h2 fw-bold">All Authors</p>
+    </div>
+
+    <div class="col-6 text-end">
+        <button type="button" data-bs-toggle="modal" data-bs-target="#AddModal" class="btn btncol m-1 text-white fw-bold">Add Author</button>
+
+        @* //Add Model *@
+        <div class="modal fade" id="AddModal" tabindex="-1" aria-labelledby="AddModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <form method="post" class="modal-content" asp-action="AddAuthor" asp-controller="Dashboard">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="AddModalLabel">Add new Author...</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <label asp-for="@Model.NewAuthor" class=" form-label fw-bold "></label>
+                                <input style="height:6vh;border-color:#ef9f10;border-radius:15px" class="form-control" asp-for="@Model.NewAuthor">
+                                <span asp-validation-for="@Model.NewAuthor" class="form-text text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn text-white fw-bold btn-warning">Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+@* // Second section *@
+<div class="row mt-4 justify-content-around">
+    <div class="col-md-10 mx-auto">
+        <form class="" method="get" asp-action="AuthorList" asp-controller="Dashboard">
+            <div class="input-group">
+                <button type="submit" asp-route-orderby="@Model.orderby" class="input-group-text" id="basic-addon1"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <input class="form-control" name="searchtext" value="@Model.searchtext" placeholder="Search by author's' name" style="height:6vh">
+            </div>
+        </form>
+    </div>
+    <div class="col-md-2  mx-auto align-self-center"><span class="h4">Count : @Model.AuthorCount</span> </div>
+</div>
+
+
+
+
+
+
+
+@* // Third section *@
+<div class="row mt-3 justify-content-end">
+    <div class="col-12">
+        <table class="table table-secondary">
+            <thead class="">
+                <tr class="text-center">
+                    <th style="border-radius:20px 0 0 0 "><a class="text-decoration-none text-dark" asp-action="AuthorList" asp-controller="Dashboard" asp-route-orderby="1" asp-route-searchtext="@Model.searchtext"> Author no. </a></th>
+                    <th><a class="text-decoration-none text-dark" asp-action="AuthorList" asp-controller="Dashboard" asp-route-orderby="2" asp-route-searchtext="@Model.searchtext"> Name </a></th>
+                    <th><a class="text-decoration-none text-dark" asp-action="AuthorList" asp-controller="Dashboard" asp-route-orderby="3" asp-route-searchtext="@Model.searchtext"> Book Published </a></th>
+                    <th><a class="text-decoration-none text-dark" asp-action="AuthorList" asp-controller="Dashboard" asp-route-orderby="4" asp-route-searchtext="@Model.searchtext"> Total sales </a></th>
+                    <th style="border-radius:0 20px 0 0 ">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var genre in Model.AuthorDetailInAuthorList)
+                {
+                    <tr class="text-center">
+                        <td class="py-2 pb-0">@genre.AuthorId</td>
+                        <td class="py-2 pb-0">@genre.AuthorName</td>
+                        <td class="py-2 pb-0">@genre.BookPublish</td>
+                        <td class="py-2 pb-0">@genre.Totalsales</td>
+                        <td class="py-2 pb-1">
+                            <span><button type="button" data-bs-toggle="modal" data-bs-target="#UpdateModal_@genre.AuthorId" class="fw-bold bg-primary px-3 py-2 text-decoration-none btn text-white"><i class="fa-solid fa-pen-to-square"></i></button></span>
+                            <span><button type="button" data-bs-toggle="modal" data-bs-target="#DeleteModal_@genre.AuthorId" class="fw-bold bg-danger px-3 py-2  text-decoration-none btn text-white"><i class="fa-solid fa-trash"></i></button></span>
+                        </td>
+                    </tr>
+
+
+                    // Update Model
+                    <div class="modal fade" id="UpdateModal_@genre.AuthorId" tabindex="-1" aria-labelledby="UpdateModalLabel_@genre.AuthorId">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form asp-action="UpdateAuthor" asp-controller="Dashboard" method="post" class="">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="UpdateModalLabel_@genre.AuthorId">Are you sure, delete Author...</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <label asp-for="@Model.CurrentAuthor" class=" form-label fw-bold bg-danger"></label>
+                                                <input value="@genre.AuthorName" style="height:6vh;border-color:#ef9f10;border-radius:15px" class="form-control" asp-for="@Model.CurrentAuthor">
+                                                <input hidden name="AuthorId" value="@genre.AuthorId">
+                                                <span asp-validation-for="@Model.CurrentAuthor" class="form-text text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-warning">Update</button>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    // Delete Model
+                    <div class="modal fade" id="DeleteModal_@genre.AuthorId" tabindex="-1" aria-labelledby="DeleteModalLabel_@genre.AuthorId">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="DeleteModalLabel_@genre.AuthorId">Are you sure, delete Genre...</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <a asp-action="DeleteAuthor" asp-route-AuthorId="@genre.AuthorId" asp-controller="Dashboard" class="btn btn-danger">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @* // Pagination section *@
+    <div class="col-md-3 ">
+        <nav aria-label="Page navigation ">
+            <ul class="pagination ">
+                <li class="page-item border-1 @(Model.CurrentPage == 1? "disabled":"") border-warning border">
+                    <a class="page-link" asp-action="AuthorList" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-currentpage="@(Model.CurrentPage - 1)" aria-label="Previous" style="color:#ef9f10">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                @for (int i = Start; i <= End; i++)
+                {
+                    <li class="page-item border-1 border-warning border"><a style="color:#ef9f10" class="page-link" asp-action="AuthorList" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-currentpage="@i">@i</a></li>
+                }
+
+                <li class="page-item border-1 border-warning border @(Model.CurrentPage == Model.TotalPages? "disabled":"")">
+                    <a class="page-link " style="color:#ef9f10" asp-action="AuthorList" asp-controller="Dashboard" asp-route-orderby="@Model.orderby" asp-route-searchtext="@Model.searchtext" asp-route-currentpage="@(Model.CurrentPage + 1)" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+
+
+
+
+
+@* // Forth section *@
+<div class="row mt-3 border-top border-3">
+    <div class="col-md-12">
+        <p class="h2 fw-bold text-decoration-underline">Bulk Upload</p>
+        <p class="h4 ">Upload Authors in bluk with an Excel file. Each row in the file should include the following columns: Id ,Name ,Books Published ,Total sales </p>
+    </div>
+    <div class="col-md-12 mt-2">
+        <form class="w-100" method="post" asp-action="GetAuthorExcelFile" asp-controller="Dashboard">
+            <input hidden name="searchtext" value="@Model.searchtext" />
+            <input hidden name="orderby" value="@Model.orderby" />
+            <input type="submit" class="btn btncol fw-bold text-white px-3 py-2 w-50" value="upload excel file" />
+        </form>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial.cshtml" />
+}

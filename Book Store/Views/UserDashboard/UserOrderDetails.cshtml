@@ -1,0 +1,243 @@
+﻿@model UserOrderdetailsVM
+@{
+    ViewData["Title"] = "UserOrderDetails";
+    Layout = "/Views/Shared/_UserDashboardLayout.cshtml";
+    string progress = Model.StatusId switch
+    {
+        1 => "25",
+        2 => "50",
+        3 => "75",
+        4 => "100",
+        5 => "100",
+        6 => "100",
+    };
+    var result = (TempData["result"] == null) ? 0 : (bool)TempData["result"] ? 1 : 2;      //NUll --> 0        ,   True --> 1    ,   False --> 2
+    var Message = (TempData["message"] == null) ? "" : (string)TempData["message"];      //NUll --> 0        ,   True --> 1    ,   False --> 2
+}
+
+@* // First Section *@
+<div class="row">
+
+    <div class="col-md-12 p-3  mt-4" style="background-color:#d3d3d3">
+        <div class="row justify-content-between">
+            <div class="col-md-4">
+                <h3>Order #@Model.OrderId</h3>
+                <h6>Created on @Model.CreatedDate</h6>
+            </div>
+
+            <div class="col-md-6 text-end ">
+                <a asp-route-OrderId="@Model.OrderId" asp-action="MakeOrderInvice" asp-controller="UserDashboard" class="px-4 py-3 h5 text-decoration-none bg-light" style="border-radius:15px;color:#ef9f10;border:2px solid #ef9f10" download>Download Invoice</a>
+
+                <form method="post" asp-action="SendOrderInvoice" asp-controller="UserDashboard" class="btn" style="">
+                    <input hidden name="OrderId"  value="@Model.OrderId"/>
+                    <button class=" text-white btncol px-4 py-3 border-0 h5" style="border-radius:15px;font-weight:bold;cursor:pointer" type="submit">Send Invoice</button>
+                </form>
+
+            </div>
+
+            <div class="col-md-12 mt-0">
+                <div class="row">
+
+                    <div class="col-3 mb-0 h4 text-center">
+                        <i class="fa-solid fa-hourglass-start p-3 text-decoration-line-through " style="border-radius:50%;border:4px solid @(Model.StatusId > 1 || Model.StatusId == 1 ? "#ef9f10": "#d3d3d3 ");color:@(Model.StatusId > 1 || Model.StatusId == 1 ? "#ef9f10": "#d3d3d3 ")"></i>
+                    </div>
+                    <div class="col-3 mb-0 h4 text-center">
+                        <i class="fa-solid fa-people-carry-box p-3 text-decoration-line-through " style="border-radius:50%;border:4px solid @(Model.StatusId > 1 || Model.StatusId == 1 ? "#ef9f10": "#d3d3d3 ");color:@(Model.StatusId > 1 || Model.StatusId == 1 ? "#ef9f10": "#d3d3d3 ")"></i>
+                    </div>
+                    <div class="col-3 mb-0 h4 text-center">
+                        <i class="fa-solid fa-truck p-3 text-decoration-line-through " style="border-radius:50%;border:4px solid @(Model.StatusId > 1 || Model.StatusId == 1 ? "#ef9f10": "#d3d3d3 ");color:@(Model.StatusId > 1 || Model.StatusId == 1 ? "#ef9f10": "#d3d3d3 ")"></i>
+                    </div>
+                    <div class="col-3 mb-0 h4 text-center">
+                        <i class="fa-solid fa-gift p-3 text-decoration-line-through " style="border-radius:50%;border:4px solid @(Model.StatusId > 1 || Model.StatusId == 1 ? "#ef9f10": "#d3d3d3 ");color:@(Model.StatusId > 1 || Model.StatusId == 1 ? "#ef9f10": "#d3d3d3 ")"></i>
+                    </div>
+                    <div class="col-12">
+                        <div class="progress">
+                            <div class="progress-bar  w-@(progress)" role="progressbar" style="background-color:#ef9f10"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+@* // Second Section *@
+<div class="row">
+    <div class="col-md-12 p-1  mt-4" >
+        <div class="row">
+
+            @* // Customer Information *@
+            <div class="col-md-6" >
+                <div class="row m-1" style="background-color:#d3d3d3">
+                     <div class="col-md-12 p-3 pb-0">
+                        <p class="h3 text-decoration-underline">Customer Information</p>
+                     </div>
+
+                     <div class="col-md-6 px-4 py-1">
+                         <span class="text-muted">First Name</span> <br />
+                         <span class="h6">@Model.Firstname</span>
+                     </div>
+
+                    <div class="col-md-6 px-4 py-1">
+                        <span class="text-muted">Last Name</span> <br />
+                        <span class="h6">@Model.Lastname</span>
+                    </div>
+
+                    <div class="col-md-12 px-4 py-1">
+                        <span class="text-muted">Email</span> <br />
+                        <span class="h6">@Model.Email</span>
+                    </div>
+
+                    <div class="col-md-12 px-4 py-1 pb-3">
+                        <span class="text-muted">Phone</span> <br />
+                        <span class="h6">@Model.Phone</span>
+                    </div>
+                </div>
+            </div>
+
+            @* // Shipping Information *@
+            <div class="col-md-6 " >
+                <div class="row m-1" style="background-color:#d3d3d3">
+                    <div class="col-md-12 p-3 pb-0">
+                        <p class="h3 text-decoration-underline">Shipping Information</p>
+                    </div>
+                    
+                    <div class="col-md-12 px-4 py-1">
+                        <span class="text-muted">Address</span> <br />
+                        <span class="h6">@Model.Address</span>
+                    </div>
+
+                    <div class="col-md-6 px-4 py-1">
+                        <span class="text-muted">City</span> <br />
+                        <span class="h6">@Model.City</span>
+                    </div>
+
+                    <div class="col-md-6 px-4 py-1">
+                        <span class="text-muted">State</span> <br />
+                        <span class="h6">@Model.State</span>
+                    </div>
+
+
+                    <div class="col-md-12 px-4 py-1 pb-3">
+                        <span class="text-muted">Shipping Date</span> <br />
+                        <span class="h6">@Model.ShippingDate</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+@* // Third Section *@
+<div class="row mt-4" style="background-color:#d3d3d3">
+    <div class="col-12">
+        <p class="h3 p-2 text-decoration-underline">Order Items</p>
+    </div>
+
+    <div class="col-md-12">
+        <table class="table table-hover">
+            <thead>
+                <tr class="text-center">
+                    <th class="w-50">Item</th>
+                    <th class="">Quantity</th>
+                    <th class="">Price</th>
+                    <th class="">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.OrderItems)
+                {
+                    <tr class="text-center align-content-center">
+                        <td>
+                            <div class="row ">
+                                <div class="col-4 ">
+                                    <a asp-action="BookDetails" asp-controller="Home" asp-route-BookId="@item.BookId">
+                                        <img src="@(item.BookImage == null? "": @item.BookImage)" alt="aaa" class="img-fluid" />
+                                    </a>
+                                </div>
+                                <div class="col-8 align-self-center">
+                                    <p class="h5">@item.BookName</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="h5">@item.Quantity</td>
+                        <td class="h5">@item.Price</td>
+                        <td class="h5">@item.Total</td>
+                    </tr>
+                }
+                <tr class="text-center">
+                    <td></td>
+                    <td></td>
+                    <td class="h4">Subtotal</td>
+                    <td class="h4">@Model.Subtotal</td>
+                </tr>
+                <tr class="text-center">
+                    <td></td>
+                    <td></td>
+                    <td class="h4">Shipping</td>
+                    <td class="h4">@Model.Shipping</td>
+                </tr>
+                <tr class="text-center">
+                    <td></td>
+                    <td></td>
+                    <td class="h4">Total</td>
+                    <td class="h4">@Model.Total</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+
+
+
+@* // Last Part Tasts *@
+<div id="toastContainer" class="position-fixed bottom-50 w-25 h-25 start-0 p-3" style="z-index: 1050;">
+    <div id="toastSuccess" class="toast btncol text-white border-dark border-3 @(result == 1? "show" : "")" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header btncol text-white">
+            <strong class="me-auto h5">Success</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body h6" id="toastSuccessMessage">@Message</div>
+    </div>
+
+    <div id="toastError" class="toast bg-danger text-white  border-dark border-3 @(result == 2? "show" : "")" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-danger text-white">
+            <strong class="me-auto h5">Error</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body h6" id="toastErrorMessage">@Message</div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var successToast = document.getElementById("toastSuccess");
+            var errorToast = document.getElementById("toastError");
+
+            function showToast(toastElement) {
+                if (toastElement.classList.contains("show")) {
+                    setTimeout(function () {
+                        var toastInstance = new bootstrap.Toast(toastElement);
+                        toastInstance.hide(); 
+                    }, 2500); 
+                }
+            }
+
+            showToast(successToast);
+            showToast(errorToast);
+        });
+    </script>
+}

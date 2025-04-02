@@ -1,0 +1,297 @@
+﻿@model UserWishlistVM
+@{
+    ViewData["Title"] = "UserFavorites";
+    Layout = "/Views/Shared/_UserDashboardLayout.cshtml";
+}
+
+
+
+@section Css {
+    <style>
+        .stars {
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        .star {
+            color: gray;
+        }
+
+            .star.selected, .star:hover {
+                color: gold;
+            }
+
+            .heart-checkbox input {
+                display: none;
+            }
+
+        .heart {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            background-color: white;
+            clip-path: polygon(50% 15%, 85% 15%, 100% 40%, 50% 100%, 0% 40%, 15% 15%);
+            transition: background-color 0.3s ease;
+        }
+
+        .heart-checkbox input:checked + .heart {
+            background-color: red;
+        }
+
+        .fav .card{
+            position:relative;
+        }
+
+
+        .fav .card .heart-checkbox{
+            position:absolute;
+            top:0;
+            right:0
+        }
+
+    </style>
+}
+
+
+
+
+
+@* // First Section  ==> Wishlist *@
+<div class="row bg-light my-2">
+    <p class="h2 px-4 pt-2 text-decoration-underline">My Wishlist</p>
+    <p class="h6 px-4 mb-4">(@Model.ItemsNum) items saved</p>
+
+    @foreach (var book in Model.userFavoriteBooks)
+    {
+        <div class="fav col-lg-3 col-md-4 my-2">
+            <div class="card p-2 shadow " >
+                <a asp-action="BookDetails" asp-route-BookId="@book.BookId" asp-controller="Home" class="card-text text-dark text-decoration-none">
+                    <img src="@(book.BookImage == null? "http://books.google.com/books/content?id=x9NDbpRYu50C&printsec=frontcover&img=1&zoom=1&source=gbs_api" : book.BookImage)" class="card-img-top mx-auto" alt="...">
+                </a>
+                <label class="heart-checkbox m-2 px-1 border border-2">
+                    <input type="checkbox" class="heartCheckbox" @(book.IsFav ? "checked" : "") data-item-id="@book.BookId">
+                    <span class="heart"></span>
+                </label>
+                <div class="card-body  px-1 py-0">
+                    <p class="fw-bold my-0 card-title">
+                        <a asp-action="BookDetails" asp-route-BookId="@book.BookId" asp-controller="Home" class="card-text text-dark text-decoration-none"> @book.BookName</a>
+                    </p>
+                    <div class="d-flex flex-row justify-content-between my-0">
+                        <p class=" text-muted">
+                            <a asp-action="BookDetails" asp-route-BookId="@book.BookId" asp-controller="Home" class="card-text text-dark text-decoration-none">@book.Genre</a>
+                        </p>
+                        <p class="">
+                            <i class="fa-solid fa-star" style="color:#ef9f10"></i>
+                            <a asp-action="BookDetails" asp-route-BookId="@book.BookId" asp-controller="Home" class="card-text text-dark text-decoration-none">@book.PeopleCount</a>
+                        </p>
+                    </div>
+                    <div class="d-flex flex-row justify-content-between">
+                        <p class="fw-bold my-0 d-flex">
+                            <a asp-action="BookDetails" asp-route-BookId="@book.BookId" asp-controller="Home" class="card-text text-dark text-decoration-none">egy @book.Price</a>
+                        </p>
+                        <button id="addToCartBtn" data-book-id="@book.BookId" class="btn btncol d-flex text-white fw-bold">Add to Cart</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    }
+
+    <div class="col-md-12 my-3">
+        <div class="row  justify-content-between">
+            <div class="col-md-2">
+                <form method="post" asp-action="ClearUserFavoriteList" asp-controller="UserDashboard" class="@(Model.ItemsNum ==0 ? "d-none":"")" style="">
+                    <input class="fw-bold text-white bg-secondary p-2 border-0 rounded-2" style="cursor:pointer" type="submit" value="Clear All" />
+                </form>
+            </div>
+
+            <div class="col-md-6 text-end">
+                <div class="row justify-content-end">
+                    <div class="col-4 ">
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#sharewishlist" class="btn @(Model.ItemsNum ==0 ? "d-none":"") btn-secondary fw-bold p-2">Share Wishlist</button>
+                    </div>
+                    <div class="col-4 text-start">
+                        <form id="addAllToCartForm" method="post" asp-action="" asp-controller="" class="@(Model.ItemsNum == 0 ? "d-none" : "")">
+                            <input id="addAllToCartBtn" class="fw-bold text-white btncol p-2 border-0 rounded-2" style="cursor:pointer" type="button" value="Add All to Cart" />
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        @* // Share Model *@
+
+        <div class="modal fade" id="sharewishlist" data-bs-keyboard="false" tabindex="-1" aria-labelledby="sharewishlist" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="sharewishlist">Share Wishlist with Friends...</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="mb-3">
+                                <label for="exampleInputEmail1" class="form-label">Enter Email or Username of your Friend</label>
+                                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="sendRequestBtn" type="button" class="btn btncol text-white fw-bold">Send</button>
+                        <button type="button" class="btn bg-secondary text-white fw-bold" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+@* // Forth Part Tasts *@
+<div id="toastContainer" class="position-fixed bottom-0 w-25 h-25 start-0 p-3" style="z-index: 1050;">
+    <div id="toastSuccess" class="toast btncol text-white   border-dark border-3 " role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header btncol text-white">
+            <strong class="me-auto h5">Success</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body h6" id="toastSuccessMessage">Item added to cart successfully!</div>
+    </div>
+
+    <div id="toastError" class="toast bg-danger text-white  border-dark border-3 " role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-danger text-white">
+            <strong class="me-auto h5">Error</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body h6" id="toastErrorMessage">Failed to add item to cart.</div>
+    </div>
+</div>
+
+
+
+
+
+
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            
+            $("#sendRequestBtn").click(function () {
+                let userEmail = $("#exampleInputEmail1").val(); 
+
+                if (!userEmail) {
+                    alert("Please enter an email or username.");
+                    return;
+                }
+
+                $.ajax({
+                    url: `/UserDashboard/SendFavoriteToFriend?email=${userEmail}`,
+                    type: "GET",
+                    success: function (response) {
+                        if (response.result) {
+                            $("#toastSuccessMessage").text(response.message);
+                            showToast("toastSuccess", 2000);
+                        } else {
+                            $("#toastErrorMessage").text(response.message); 
+                            showToast("toastError", 2000);
+                        }
+                    },
+                    error: function () {
+                        $("#toastErrorMessage").text("An unexpected error occurred.");
+                        showToast("toastError", 2000);
+                    }
+                });
+            });
+
+
+
+            //Favorite
+            document.addEventListener("change", function (event) {
+                if (event.target.classList.contains("heartCheckbox")) {
+                    let isChecked = event.target.checked;
+                    let itemId = event.target.getAttribute("data-item-id");
+
+                    console.log("Checked:", isChecked);
+                    console.log("Item ID:", itemId);
+
+                    fetch(`/Home/AddRemoveFavourite?itemId=${itemId}&isChecked=${isChecked}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => console.log("Response:", data))
+                    .catch(error => console.error('Error:', error));
+                }
+            });
+
+
+
+
+            $(document).on("click", "#addToCartBtn", function () {
+                let bookId = $(this).data("book-id"); 
+
+                $.ajax({
+                    url: `/Home/AddNewBook?BookId=${bookId}&Quantity=1`,
+                    type: "GET",
+                    success: function (response) {
+                        if (response.result) {
+                            $("#toastSuccessMessage").text(response.message); 
+                            showToast("toastSuccess", 2000);
+                            updateCartCount();
+                        } else {
+                            $("#toastErrorMessage").text(response.message); 
+                            showToast("toastError", 2000);
+                        }
+                    },
+                    error: function () {
+                        $("#toastErrorMessage").text("An unexpected error occurred.");
+                        showToast("toastError", 2000);
+                    }
+                });
+            });
+
+            // Function to show toast
+            function showToast(toastId, duration = 5000) {
+                let toastElement = document.getElementById(toastId);
+                if (toastElement) {
+                    let toast = new bootstrap.Toast(toastElement, { delay: duration });
+                    toast.show();
+                }
+            }
+
+
+            //Add All To Cart
+            document.getElementById("addAllToCartBtn").addEventListener("click", function () {
+                $.ajax({
+                    url: `/UserDashboard/AddUserFavoriteToCart`,
+                    type: "Post",
+                    success: function (response) {
+                        if (response.result) {
+                            $("#toastSuccessMessage").text(response.message); // Update message
+                            showToast("toastSuccess", 2000);
+                            updateCartCount();
+                        } else {
+                            $("#toastErrorMessage").text(response.message); // Update message
+                            showToast("toastError", 2000);
+                        }
+                    },
+                    error: function () {
+                        $("#toastErrorMessage").text("An unexpected error occurred.");
+                        showToast("toastError", 2000);
+                    }
+                });
+            });
+        });
+
+
+
+
+    </script>
+}

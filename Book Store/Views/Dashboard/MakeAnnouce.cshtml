@@ -1,0 +1,165 @@
+﻿@model MakeAnnouceVM
+@{
+    ViewData["Title"] = "MakeAnnouce";
+    ViewData["action"] = "MakeAnnounce";
+    ViewData["pagename"] = "Make Annouce";
+
+    var result = (TempData["result"] == null) ? 0 : (bool)TempData["result"] ? 1 : 2;      //NUll --> 0        ,   True --> 1    ,   False --> 2
+    var Message = (TempData["message"] == null) ? "" : (string)TempData["message"];      //NUll --> 0        ,   True --> 1    ,   False --> 2
+
+    Layout = "/Views/Shared/_DashboardLayout.cshtml";
+}
+
+
+
+
+@* // First section *@
+<div class="row justify-content-between mt-2">
+    <div class="col-5 ">
+        <p class="h2 fw-bold">Send Email</p>
+    </div>
+</div>
+
+
+
+
+
+@* // Filter by Roles *@
+<div class="row mt-2">
+
+    <div class="col-md-1 text-center">
+        <p class="fw-bold">filter by :</p>
+    </div>
+
+    <div class="col-md-5">
+        <select id="roleSelect" name="RoleSelection" class="form-select" aria-label="Pick a Role">
+            <option selected value="None">None</option>
+            <option value="All">All</option>
+            <option value="User">User</option>
+            <option value="Admin">Admin</option>
+            <option value="Delivery">Delivery</option>
+        </select>
+    </div>
+
+
+</div>
+
+
+
+
+
+
+@* // Third Section *@
+<div class="row">
+    <div class="co-md-12">
+
+        <form method="post" asp-action="MakeAnnounce" asp-controller="Dashboard" class="w-100" enctype="multipart/form-data">
+            <input type="hidden" name="selectedRole" id="selectedRoleInput">
+            <div class="modal-content text-start">
+                <div class="modal-header">
+                    <h5 class="modal-title">Make Response</h5>
+                </div>
+                <div class="modal-body text-start">
+                    <div class="row">
+                        <div class="col-md-12 mb-1" id="emailInputContainer">
+                            <label for="RecieveEmails" class="form-label fw-bold">Recipient Emails</label>
+                            <input type="text" id="RecieveEmails" name="RecieveEmails" style="height:6vh;border-color:#ef9f10;border-radius:15px" class="form-control">
+                            <span class="form-text text-danger"></span>
+                        </div>
+                        <div class="col-md-12 mb-1">
+                            <label asp-for="@Model.MakeResponse.Subject" class="form-label fw-bold"></label>
+                            <input asp-for="@Model.MakeResponse.Subject" name="Subject" style="height:6vh;border-color:#ef9f10;border-radius:15px" class="form-control">
+                            <span asp-validation-for="@Model.MakeResponse.Subject" data-valmsg-for="Subject" class="form-text text-danger"></span>
+                        </div>
+                        <div class="col-md-12 mb-1">
+                            <label asp-for="@Model.MakeResponse.Body" class="form-label fw-bold"></label>
+                            <textarea asp-for="@Model.MakeResponse.Body" name="Body" style="height:6vh;border-color:#ef9f10;border-radius:15px" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="@Model.MakeResponse.Body" data-valmsg-for="Body" class="form-text text-danger"></span>
+                        </div>
+                        <div class="col-md-12 mb-1">
+                            <label asp-for="@Model.MakeResponse.Attachment" class="form-label"></label>
+                            <input class="form-control" type="file" asp-for="@Model.MakeResponse.Attachment" name="Attachment">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btncol text-white">Send</button>
+                </div>
+            </div>
+
+        </form>
+
+
+    </div>
+</div>
+
+
+
+
+
+@* // Forth Part Tasts *@
+<div id="toastContainer" class="position-fixed top-0   p-3" style="z-index: 1050;right:10%">
+    <div id="toastSuccess" class="toast btncol text-white border-dark border-3 @(result == 1? "show" : "")" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header btncol text-white">
+            <strong class="me-auto h5">Success</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body h6" id="toastSuccessMessage">@Message</div>
+    </div>
+
+    <div id="toastError" class="toast bg-danger text-white  border-dark border-3 @(result == 2? "show" : "")" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-danger text-white">
+            <strong class="me-auto h5">Error</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body h6" id="toastErrorMessage">@Message</div>
+    </div>
+</div>
+
+
+
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var successToast = document.getElementById("toastSuccess");
+            var errorToast = document.getElementById("toastError");
+
+            function showToast(toastElement) {
+                if (toastElement.classList.contains("show")) {
+                    setTimeout(function () {
+                        var toastInstance = new bootstrap.Toast(toastElement);
+                        toastInstance.hide();
+                    }, 2500);
+                }
+            }
+
+            showToast(successToast);
+            showToast(errorToast);
+        });
+
+
+        document.getElementById("roleSelect").addEventListener("change", function() {
+            var selectedValue = this.value;
+            var emailContainer = document.getElementById("emailInputContainer");
+            var emailInput = document.getElementById("RecieveEmails");
+
+            if (selectedValue === "None") {  
+                emailContainer.style.display = "block";
+                emailInput.setAttribute("required", "required");
+            } else {
+                emailContainer.style.display = "none";
+                emailInput.removeAttribute("required");
+                emailInput.value = ""; 
+            }
+            document.getElementById("selectedRoleInput").value = this.value;
+
+        });
+        document.getElementById("roleSelect").dispatchEvent(new Event("change"));
+
+
+        
+    </script>
+    <partial name="_ValidationScriptsPartial.cshtml" />
+}

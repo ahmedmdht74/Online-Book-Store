@@ -1,0 +1,177 @@
+﻿@model List<UserOrdersVM>
+@{
+    ViewData["Title"] = "UserProfile";
+    var result = (TempData["result"] == null) ? 0 : (bool)TempData["result"] ? 1 : 2;      //NUll --> 0        ,   True --> 1    ,   False --> 2
+    var Message = (TempData["message"] == null) ? "" : (string)TempData["message"];      //NUll --> 0        ,   True --> 1    ,   False --> 2
+    Layout = "/Views/Shared/_UserDashboardLayout.cshtml";
+}
+
+
+@* // First Section *@
+
+<div class="row">
+    <p class="h2 px-4 py-2 text-decoration-underline">Order History</p>
+
+
+    <div class="col-md-12 my-2">
+
+        @if(Model != null && Model.Count > 0){
+            foreach (var item in Model)
+            {
+                var limit = item.TotalItems >= 3 ? 3 : item.TotalItems;
+
+                <div class="row  mx-5 my-4 p-2 bg-light" style="border:2px solid #ef9f10;padding:4.5vh">
+
+                    @* // Left Section *@
+                    <div class="col-md-7 ">
+                        <div class="row">
+
+                            <div class="col-md-5">
+                                <div class="row justify-content-center">
+                                    @for (int i = 0; i < limit; i++)
+                                    {
+                                        <div class="col-6 text-center my-1">
+                                            <img src="@item.Images[i]" alt="book" class="img-fluid w-100" style="height:15vh;border:2px solid #ef9f10;" />
+                                        </div>
+                                    }
+                                    @* // More Than 4 Books *@
+                                    <div class="col-6 @(item.TotalItems >= 4? "":"d-none")  row m-0 text-center my-1 ">
+                                        <div class="col align-self-center bg-light" style="border:2px solid #ef9f10;padding:4.5vh">
+                                            <span class="h2">+@(item.TotalItems - limit)</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="col-md-7 align-content-around ">
+                                <p class="h4 py-1"> Order :      <span class="h5">#@item.OrderId</span>   </p>
+                                <p class="h4 py-1"> Total Items : <span class="h5">@item.TotalItems </span>   </p>
+                                <p class="h4 py-1"> Total Price : <span class="h5">egy @item.TotalPrice</span>   </p>
+                                <p class="h4 py-1"> Ordered By : <span class="h5">@item.OrderedBy</span> </p>
+                                <p class="h4 py-1"> Date : <span class="h5">@item.Date</span> </p>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    @* // Right Section   ===> Tracking order , View order detais , Get Invoice , Edit Order *@   
+                        <div class="col-md-5 align-self-center">
+                        <div class="row ">
+
+                            <div class="col-12 py-2 p-1">
+                                <button class="btn btncol fw-bold text-white w-100" style="height:6vh" data-bs-toggle="modal" data-bs-target="#Trackdetails@(item.OrderId)">Track Order</button>
+                            </div>
+
+                            @* // Model *@
+                            <div class="modal fade" id="Trackdetails@(item.OrderId)" data-bs-keyboard="false" tabindex="-1" aria-labelledby="Trackdetails@(item.OrderId)" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="Trackdetails@(item.OrderId)">Tracking Details</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+
+                                                <div class="col-3 h4 text-center">
+                                                    <i class="fa-solid fa-hourglass-start p-3 text-decoration-line-through " style="border-radius:50%;border:4px solid @(item.StatusId > 1 || item.StatusId == 1 ? "#ef9f10": "#d3d3d3 ");color:@(item.StatusId > 1 || item.StatusId == 1 ? "#ef9f10": "#d3d3d3 ")"></i>
+                                                </div>
+                                                <div class="col-3 h4 text-center">
+                                                    <i class="fa-solid fa-people-carry-box p-3 text-decoration-line-through " style="border-radius:50%;border:4px solid @(item.StatusId > 2 || item.StatusId == 2 ? "#ef9f10": "#d3d3d3 ");color:@(item.StatusId > 2 || item.StatusId == 2 ? "#ef9f10": "#d3d3d3 ")"></i>
+                                                </div>
+                                                <div class="col-3 h4 text-center">
+                                                    <i class="fa-solid fa-truck p-3 text-decoration-line-through " style="border-radius:50%;border:4px solid @(item.StatusId > 3 || item.StatusId == 3 ? "#ef9f10": "#d3d3d3 ");color:@(item.StatusId > 3 || item.StatusId == 3 ? "#ef9f10": "#d3d3d3 ")"></i>
+                                                </div>
+                                                <div class="col-3 h4 text-center">
+                                                    <i class="fa-solid fa-gift p-3 text-decoration-line-through " style="border-radius:50%;border:4px solid @(item.StatusId > 4 || item.StatusId == 4 ? "#ef9f10": "#d3d3d3 ");color:@(item.StatusId > 4 || item.StatusId == 4 ? "#ef9f10": "#d3d3d3 ")"></i>
+                                                </div>
+
+
+                                                @for (int d = 0; d < 4; d++)
+                                                {
+                                                    <div class="col-3 h4 text-center ">
+                                                        <span class="h6">@item.StatusName[d].Name</span>
+                                                    </div>
+                                                }
+
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <a asp-action="UserOrderDetails" asp-controller="UserDashboard" asp-route-OrderId="@item.OrderId" class="btn btncol text-white">Order details</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-12 py-2 p-1">
+                                <a asp-action="UserOrderDetails" asp-controller="UserDashboard" asp-route-OrderId="@item.OrderId" class="btn btncol fw-bold text-white w-100" style="height:6vh">View Order Detais</a>
+                            </div>
+
+                            
+                            <div class="col-12 py-2 p-1">
+                                <a asp-route-OrderId="@item.OrderId" asp-action="MakeOrderInvice" asp-controller="UserDashboard" class="btn btncol fw-bold text-white w-100" style="height:6vh" download>Get Invoice</a>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+            }
+        }
+        else
+        {
+            <div class="col-md-12 align-self-center text-center">
+                <p style="background-color:#d3d3d3" class="h3 p-3 rounded rounded-pill">No Books in your WishList yet.....</p>
+            </div>
+        }
+
+
+    </div>
+
+</div>
+
+
+
+
+
+@* // Forth Part Tasts *@
+<div id="toastContainer" class="position-fixed bottom-0 w-25 h-25 start-0 p-3" style="z-index: 1050;">
+    <div id="toastError" class="toast bg-danger text-white  border-dark border-3 @(result == 2? "show" : "")" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-danger text-white">
+            <strong class="me-auto h5">Error</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body h6" id="toastErrorMessage">@Message</div>
+    </div>
+
+    
+</div>
+
+
+
+@section Scripts{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var errorToast = document.getElementById("toastError");
+
+            function showToast(toastElement) {
+                if (toastElement.classList.contains("show")) {
+                    setTimeout(function () {
+                        var toastInstance = new bootstrap.Toast(toastElement);
+                        toastInstance.hide(); 
+                    }, 2500); 
+                }
+            }
+
+            showToast(errorToast);
+        });
+    </script>
+}

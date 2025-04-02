@@ -1,0 +1,210 @@
+﻿@model HomeDashVM
+@{
+    ViewData["Title"] = "HomeDash";
+    ViewData["action"] = "HomeDash";
+    ViewData["pagename"] = "Home";
+    Layout = "/Views/Shared/_DashboardLayout.cshtml";
+}
+
+
+@* // First section *@
+<div  class="row justify-content-between mt-2">
+    <div class="col-3 ">
+        <p class="h2">@Model.Period</p>
+    </div>
+
+    <div class="col-6 text-end">
+        <a class="btn btncol m-1 text-white fw-bold" asp-route-period="1" asp-action="HomeDash" asp-controller="Dashboard">Daily</a>
+        <a class="btn btncol m-1 text-white fw-bold" asp-route-period="2" asp-action="HomeDash" asp-controller="Dashboard">Weekly</a>
+        <a class="btn btncol m-1 text-white fw-bold" asp-route-period="3" asp-action="HomeDash" asp-controller="Dashboard">Monthly</a>
+        <a class="btn btncol m-1 text-white fw-bold" asp-route-period="4" asp-action="HomeDash" asp-controller="Dashboard">Yearly</a>
+    </div>
+</div>
+
+
+
+
+@* // Second section *@
+<div  class="row mt-2 p-2 border-bottom border-3">
+    
+    <div class="col-md-3 col-sm-6 border border-2 p-2 pb-0">
+        <p class="h4 px-2"><i class="fa-solid fa-sack-dollar"></i> Total Sales</p>
+        <p class="px-2">@Model.TotalSales</p>
+    </div>
+
+    <div class="col-md-3 col-sm-6 border border-2 p-2 pb-0">
+        <p class="h4 px-2"><i class="fa-solid fa-box-open"></i> Orders</p>
+        <p class="px-2">@Model.Orders</p>
+    </div>
+
+    <div class="col-md-3 col-sm-6 border border-2 p-2 pb-0">
+        <p class="h4 px-2"><i class="fa-solid fa-hand-holding-dollar"></i> Revenue</p>
+        <p class="px-2">@Model.Revenue</p>
+    </div>
+
+    <div class="col-md-3 col-sm-6 border border-2 p-2 pb-0">
+        <p class="h4 px-2"><i class="fa-solid fa-user-group"></i> New Customers</p>
+        <p class="px-2">@Model.NewCustomers</p>
+    </div>
+   
+</div>
+
+
+
+
+@*// third section *@
+ <div  class="row mt-2 border-bottom border-3"> 
+
+   @* // Stacked Line Chart section *@ 
+     <div class="col-md-8 text-center" > 
+
+        <ejs-chart id="container2" title="Olympic Medals" width="100%">
+            <e-chart-primaryxaxis valueType="Category">
+            </e-chart-primaryxaxis>
+            <e-series-collection>
+                <e-series dataSource="@Model.StackedLineChartDatas" Name="Orders" xName="Month" yName="Order"
+                          type="Column"></e-series>
+                <e-series dataSource="@Model.StackedLineChartDatas" Name="Users" xName="Month" yName="User"
+                          type="Column"></e-series>
+            </e-series-collection>
+        </ejs-chart>
+
+     </div> 
+
+
+    @* // Dount Chart section *@ 
+    <div class="col-md-4 text-center"> 
+         @if (Model.pieChartData.Count > 0) 
+         { 
+             <ejs-accumulationchart id="container" title="Genre Sale Statistics"> 
+                 <e-accumulationchart-tooltipsettings enable="true"></e-accumulationchart-tooltipsettings> 
+                 <e-accumulationchart-legendsettings visible="true"> 
+                 </e-accumulationchart-legendsettings> 
+                 <e-accumulation-series-collection> 
+                     <e-accumulation-series dataSource="@Model.pieChartData" xName="GenreName" yName="Quantity" name="Genre" innerRadius="40%"> 
+                         <e-accumulationseries-datalabel name="Percentage" visible="true" position="Outside"> 
+                             <e-font fontWeight="1000" color="black"></e-font> 
+                         </e-accumulationseries-datalabel> 
+                     </e-accumulation-series> 
+                 </e-accumulation-series-collection> 
+             </ejs-accumulationchart> 
+         } 
+         else 
+         { 
+             <p class="h4 my-5 p-5">No available data</p> 
+         } 
+     </div>
+
+ </div>
+
+
+
+
+@* // Forth section *@
+<div class="row mt-2 border-bottom border-3">
+    <div class="col-12">
+        <div class="row">
+            @* // Recent Orders *@
+            <div class="col-md-6 col-sm-12">
+                <p class="h4 fw-bold p-2">Recent Orders</p>
+                <div class="w-100 ">
+                    <table class="table table-secondary">
+                        <thead class="">
+                            <tr class="text-center">
+                                <th style="border-radius:20px 0 0 0 ">Order no.</th>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                                <th style="border-radius:0 20px 0 0 "></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.RecentOrders)
+                            {
+                                <tr class="text-center">
+                                    <td class="py-3">@item.OrderId</td>
+                                    <td class="py-3">@item.Date</td>
+                                    <td class="py-3">@item.Customer</td>
+                                    <td class="py-3">@item.Status</td>
+                                    <td class="py-3">@item.Total</td>
+                                    <td class="py-3">
+                                        <a asp-action="OrderDetails" asp-controller="Dashboard" asp-route-OrderId="@item.OrderId" class="fw-bold shadow rounded-pill px-3 py-2 text-decoration-none text-warning">View</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+
+            @* //  Low Stock Alerts *@
+            <div class="col-md-6 col-sm-12">
+                <p class="h4 fw-bold p-2">Low Stock Alerts</p>
+                <div class="w-100 ">
+                    <table class="table table-secondary">
+                        <thead class="">
+                            <tr class="text-center">
+                                <th style="border-radius:20px 0 0 0 ">Title</th>
+                                <th>Author</th>
+                                <th>Price</th>
+                                <th style="border-radius:0 20px 0 0 ">Quantity In Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.LowStockBooks)
+                            {
+                                <tr class="text-center">
+                                    <td class="py-3">@item.BookName</td>
+                                    <td class="py-3">@item.Author</td>
+                                    <td class="py-3">@item.Price</td>
+                                    <td class="py-3">
+                                        <a asp-action="AddOrEditBook" asp-route-BookId="@item.BookId" asp-controller="Dashboard" class=" text-decoration-none text-danger fw-bold">@item.Quantity</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+
+
+
+@* // Fiveth section *@
+<div class="row border-bottom border-3">
+    <p class="h4 fw-bold p-3">Top-Selling books</p>
+    <div class="col-md-12 py-2 px-5">
+        <table class="table table-secondary">
+            <thead class="">
+                <tr class="text-center">
+                    <th style="border-radius:20px 0 0 0 ">Book</th>
+                    <th>Author</th>
+                    <th>Price</th>
+                    <th>Sold</th>
+                    <th style="border-radius:0 20px 0 0 "></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.TopSellingBooks)
+                {
+                    <tr class="text-center">
+                        <td class="py-3">@item.BookName</td>
+                        <td class="py-3">@item.Author</td>
+                        <td class="py-3">@item.Price</td>
+                        <td class="py-3">@item.Sold</td>
+                        <td class="py-3">
+                            <a asp-action="AddOrEditBook" asp-route-BookId="@item.BookId" asp-controller="Dashboard" class="fw-bold shadow rounded-pill px-3 py-2 text-decoration-none text-warning">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
