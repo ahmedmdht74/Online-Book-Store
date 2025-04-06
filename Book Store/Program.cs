@@ -45,7 +45,7 @@ namespace Book_Store
             builder.Services.AddMemoryCache();
 
 
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("GTIlMmhhan1ifWBgaGNhfGNmfGFjYWZzY2ppZ2ppYWtoMjs+Njc+NzsnZGcTND4yOj99MDw+aGFq");
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("");
 
 
 
