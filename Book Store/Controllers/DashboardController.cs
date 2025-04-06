@@ -15,6 +15,7 @@ namespace Book_Store.Controllers
     public class DashboardController : Controller
     {
         private readonly IDashboardRepo _dashboardRepo;
+         
 
         public DashboardController(IDashboardRepo dashboardRepo)
         {
