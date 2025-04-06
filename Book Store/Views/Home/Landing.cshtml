@@ -29,233 +29,176 @@
 
 
 
+    <div class="container-fluid px-3">
+        @* /// First Section *@
+        <div class="mb-5" >
+            <div class="row pt-3 justify-content-between align-items-start">
+                <div class="col-12 col-md-3 text-center text-md-start mb-3 mb-md-0">
+                    <h1 class="fw-bold display-5">EXPLORE</h1>
+                    <h1 class="fw-bold display-5">BOOKS</h1>
+                </div>
 
-        <div class="marginLR">
-            @* /// First Section *@
-            <div class=" mb-5">
-        
-                <div class="row m-0 pt-3 justify-content-between ">
-                    <div class="col-md-3 ">
-                        <h1 style="font-size:50px;font-weight:bold">EXLORE </h1>
-                        <h1 style="font-size:50px;font-weight:bold"> BOOKS</h1>
-                    </div>
-        
-                    <div class="col-md-8 row m-0  justify-content-sm-start justify-content-lg-end">
-                <div class="col-12 text-end">
-                    @{
-                        if(User.Identity.IsAuthenticated){
-                            <a asp-action="About" asp-controller="Home" class="btn text-white btn-lg btncol my-1" style="border-radius:15px;">About</a>
-                            <a asp-action="Contact" asp-controller="Home" class="btn text-white btn-lg btncol my-1" style="border-radius:15px;">Contact</a>
-                            <div class="btn-group text-end">
-                                <button class="btn btncol text-white btn-lg dropdown-toggle my-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="col-12 col-md-9">
+                    <div class="d-flex flex-wrap justify-content-center justify-content-md-end gap-2">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <a asp-action="About" asp-controller="Home" class="btn text-white btn-lg btncol">About</a>
+                            <a asp-action="Contact" asp-controller="Home" class="btn text-white btn-lg btncol">Contact</a>
+
+                            <div class="dropdown">
+                                <button class="btn btncol text-white btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                     Welcome @(User.Identity.Name)!
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li class="nav-item  mx-1">
-                                        <a class="nav-link active fw-bold py-2 text-dark" asp-action="UserDashboard" asp-controller="UserDashboard">My Dashboard</a>
-                                    </li>
-                                    
-                                    @if(InAdminRole)
+                                    <li><a class="dropdown-item fw-bold" asp-action="UserDashboard" asp-controller="UserDashboard">My Dashboard</a></li>
+                                    @if (InAdminRole)
                                     {
-                                        <li class="nav-item  mx-1">
-                                            <a class="nav-link active fw-bold py-2 text-dark" asp-action="HomeDash" asp-controller="Dashboard">Dashboard</a>
-                                        </li>
-                                    } 
-                                    <li class="nav-item">
-                                        <a class="nav-link active py-2 h5 text-dark" asp-action="CartDetails" asp-controller="Home">
-                                            <i class="fa-solid fa-cart-plus"></i><span id="cartCount">(0)</span>
+                                        <li><a class="dropdown-item fw-bold" asp-action="HomeDash" asp-controller="Dashboard">Dashboard</a></li>
+                                    }
+                                    <li>
+                                        <a class="dropdown-item h5" asp-action="CartDetails" asp-controller="Home">
+                                            <i class="fa-solid fa-cart-plus"></i> <span id="cartCount">(0)</span>
                                         </a>
                                     </li>
-                                    <li class="nav-item  mx-1">
-                                        <form method="post" asp-action="LogOut" asp-controller="Account" class="" style="">
-                                                <input class="btn text-white btncol w-100 fw-bold" style="cursor:pointer" type="submit" value="Logout" />
+                                    <li>
+                                        <form method="post" asp-action="LogOut" asp-controller="Account">
+                                            <input class="btn text-white btncol w-100 fw-bold" type="submit" value="Logout" />
                                         </form>
                                     </li>
                                 </ul>
                             </div>
-
-                        }else{
-                            <a asp-action="Login" asp-controller="Account" asp-route-returnURL="@Context.Request.Path" class="btn text-white btn-lg btncol my-1" style="font-size:25px;border-radius:15px;">Log in</a>
-                            <a asp-action="Register" asp-controller="Account" class="btn text-white btn-lg btncol my-1" style="font-size:25px;border-radius:15px;">Sign up</a>
                         }
-                    }
-                </div>
-                
-            </div>
-                </div>
-        
-                <div class="row mt-5 m-0 ">
-        
-                    <div class="col-md-3 ">
-                        <img src="/images/land2.jpg" alt="land1" class="img-fluid w-75" />
+                        else
+                        {
+                            <a asp-action="Login" asp-controller="Account" asp-route-returnURL="@Context.Request.Path" class="btn text-white btn-lg btncol">Log in</a>
+                            <a asp-action="Register" asp-controller="Account" class="btn text-white btn-lg btncol">Sign up</a>
+                        }
                     </div>
-        
-        
-                    <div class="col-md-6  align-self-center">
-                        <div class=" text-center my-2">
-                            <p class="fw-bold display-3">Discover your next</p>
-                            <p class="fw-bold display-3">favorite read</p>
-                        </div>
-        
-                        <div class="col-md-12 text-center my-4">
-                            <form method="get" asp-action="Search" asp-controller="Home" class="row  py-4">
-                                <div class="col-md-9  mt-3"> 
-                                    <input class="form-control" name="searchtext" type="text" placeholder="search by title,author,genre">
-                                </div>
-        
-                                <div class="col-md-3 align-self-center my-1">
-                                    <button class="border-0 h4 btncol text-white px-4 py-3 fw-bold" style="border-radius:15px;" type="submit">Search</button>
-                                </div>
-                            </form>
-                        </div>
-        
-                    </div>
-        
-        
-                    <div class="col-md-3 text-end align-self-end">
-                        <img src="/images/land3.jpg" alt="land1" class="w-75" />
-                    </div>
-        
                 </div>
-        
-            </div>
-           
-        
-            <hr />
-        
-        
-            @* /// second Section *@
-            <div class="row">
-                <div class="col-12 my-3">
-                    <p class="h2">HOW BOOK STORE WORKS</p>
-                </div>
-        
-                <div class="col-md-12 row">
-        
-                    <div class="col-md-4 border-top border-bottom border-right py-3">
-                        <div>
-                            <img src="/images/land4.jpg" alt="photo1" class="h-100 w-100" />
-                        </div>
-                        <h3 class="my-2" style="font-weight:bold">Step 1</h3>
-                        <p style="font-size:27px;" class="mb-5">Enter your search criteria. Find books by title,author, or genre</p>
-                    </div>
-        
-                    <div class="col-md-4 border-top border-bottom py-3">
-                        <div>
-                            <img src="/images/land5.jpg" alt="photo1" class="h-100 w-100" />
-                        </div>
-                        <h3 class="my-2" style="font-weight:bold">Step 2</h3>
-                        <p style="font-size:27px;" class="mb-5">Select a book and add to cart. You're one step closer to your next great read</p>
-                    </div>
-        
-                    <div class="col-md-4 border-top border-bottom border-left py-3">
-                        <div>
-                            <img src="/images/land6.jpg" alt="photo1" class="h-100 w-100" />
-                        </div>
-                        <h3 class="my-2" style="font-weight:bold">Step 3</h3>
-                        <p style="font-size:27px;" class="mb-5">Choose your payment method . Sit back and wait for your book delivery!</p>
-                    </div>
-        
-                </div>
-        
-                
-            </div>
-        
-            @* /// Third Section *@
-            <div class="row">
-        
-                <div class="col-12 my-3">
-                    <p class="h2">Join Book Store Team</p>
-                </div>
-        
-                <div class="col-md-12 row  border-top border-bottom" >
-
-            <div class="col-md-8 text-center">
-                <img src="/images/land7.jpg" alt="photo7" class="w-50"/>
             </div>
 
-            <div class="col-md-4 mb-2 mt-5">
-                <h2 style="font-weight:bold;font-size:45px;">As a delivery rider</h2>
-                <p class="fw-bold" style="font-size:27px;">Earn by delivering books. All you need is a bike and a love for reading.</p>
-                <br>
-                <button type="button" class="btn text-white btncol px-5 py-3" style="font-size:25px;border-radius:15px;font-weight:bold">Ride along</button>
+            <div class="row mt-5">
+                <div class="col-6 col-md-3 text-center">
+                    <img src="/images/land2.jpg" class="img-fluid" alt="land1" />
+                </div>
+
+                <div class="col-12 col-md-6 text-center align-self-center">
+                    <p class="fw-bold display-5">Discover your next</p>
+                    <p class="fw-bold display-5">favorite read</p>
+
+                    <form method="get" asp-action="Search" asp-controller="Home" class="row justify-content-center py-4">
+                        <div class="col-12 col-md-8 mb-2">
+                            <input class="form-control" name="searchtext" type="text" placeholder="Search by title, author, genre">
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <button class="btn btncol text-white w-100 py-2 fw-bold" type="submit">Search</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-6 col-md-3 text-center d-none d-md-block">
+                    <img src="/images/land3.jpg" class="img-fluid" alt="land3" />
+                </div>
             </div>
         </div>
-        
-                <div class="col-md-12 row  border-top border-bottom">
 
-            <div class="col-md-8 text-center">
-                <img src="/images/land4.jpg" alt="photo8" class="w-50"/>
+        <hr />
+
+        @* /// Second Section *@
+        <div class="text-center mb-4">
+            <p class="h2">HOW BOOK STORE WORKS</p>
+        </div>
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <img src="/images/land4.jpg" class="img-fluid" alt="step1">
+                <h3 class="mt-3 fw-bold">Step 1</h3>
+                <p class="fs-5">Enter your search criteria. Find books by title, author, or genre.</p>
             </div>
-
-                <div class="col-md-4 mb-2 mt-5">
-                <h2 style="font-weight:bold;font-size:45px;">As a bookstore</h2>
-                <p class="fw-bold" style="font-size:27px;">BookStore supports bookstores with online sales,loyalty programs, and more.</p>
-                <br>
-                <button type="button" class="btn text-white btncol px-5 py-3" style="font-size:25px;border-radius:15px;font-weight:bold">Partner up</button>
+            <div class="col-md-4 mb-4">
+                <img src="/images/land5.jpg" class="img-fluid" alt="step2">
+                <h3 class="mt-3 fw-bold">Step 2</h3>
+                <p class="fs-5">Select a book and add to cart. You're one step closer to your next great read.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <img src="/images/land6.jpg" class="img-fluid" alt="step3">
+                <h3 class="mt-3 fw-bold">Step 3</h3>
+                <p class="fs-5">Choose your payment method. Sit back and wait for your book delivery!</p>
             </div>
         </div>
-        
-                <div class="col-md-12 row  border-top border-bottom" >
 
-            <div class="col-md-8 text-center">
-                <img src="/images/land9.jpg" alt="photo7" class="w-50 " />
-            </div>
-
-                <div class="col-md-4 mb-2 mt-5">
-                <h2 style="font-weight:bold;font-size:45px;">As a team</h2>
-                <p class="fw-bold" style="font-size:27px;">Join us in building the best online book delivery service.</p>
-                <br>
-                <button type="button" class="btn text-white btncol px-5 py-3" style="font-size:25px;border-radius:15px;font-weight:bold">Join our team</button>
-            </div>
-        </div>
-        
-            </div>
-        
-        
-            @* /// Forth Section *@
-            <div class="row border-bottom" style="">
-        
-                <div class="col-md-11 my-3 ">
-                    <p class="h1">Get our app now</p>
-                </div>
-            </div>
-        
-        
-            <div class="row my-5">
-                <div class="col-md-6 py-5">
-                    <h1 style="font-weight:bold;font-size:45px;">Order your favorite books!</h1>
-                    <p class="fw-bold pb-5" style="font-size:30px;">Enjoy a wide selection of books delivered to you with Book Store. Explore various genres from top authors.</p>
-                    <br/>
-                    <button type="button" class="btn text-white btncol px-5 py-3" style="font-size:25px;border-radius:15px;font-weight:bold">Get App</button>
-                </div>
-        
-                <div class="col py-5 align-self-center text-center">
-                    <img src="/images/land10.jpg" alt="photo7" class="w-75 " />
-                </div>
-            </div>
-        
-        
-            @* // Last Part Tasts *@
-            <div id="toastContainer" class="position-fixed bottom-50 w-25 h-25 start-0 p-3" style="z-index: 1050;">
-        <div id="toastSuccess" class="toast btncol text-white border-dark border-3 @(result == 1? "show" : "")" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header btncol text-white">
-                <strong class="me-auto h5">Success</strong>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
-            </div>
-            <div class="toast-body h6" id="toastSuccessMessage">@Message</div>
+        @* /// Third Section *@
+        <div class="text-center my-4 mt-3 border-top border-2">
+            <p class="h2">JOIN BOOK STORE TEAM</p>
         </div>
 
-        <div id="toastError" class="toast bg-danger text-white  border-dark border-3 @(result == 2? "show" : "")" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header bg-danger text-white">
-                <strong class="me-auto h5">Error</strong>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        <div class="row g-5">
+            <div class="col-md-6 text-center">
+                <img src="/images/land7.jpg" class="img-fluid w-75" alt="delivery rider">
             </div>
-            <div class="toast-body h6" id="toastErrorMessage">@Message</div>
+            <div class="col-md-6 align-self-center">
+                <h2 class="fw-bold fs-1">As a delivery rider</h2>
+                <p class="fs-5 fw-bold">Earn by delivering books. All you need is a bike and a love for reading.</p>
+                <button class="btn btncol text-white px-4 py-2 fw-bold">Ride along</button>
+            </div>
+
+            <div class="col-md-6 text-center">
+                <img src="/images/land4.jpg" class="img-fluid w-75" alt="bookstore">
+            </div>
+            <div class="col-md-6 align-self-center">
+                <h2 class="fw-bold fs-1">As a bookstore</h2>
+                <p class="fs-5 fw-bold">BookStore supports bookstores with online sales, loyalty programs, and more.</p>
+                <button class="btn btncol text-white px-4 py-2 fw-bold">Partner up</button>
+            </div>
+
+            <div class="col-md-6 text-center">
+                <img src="/images/land9.jpg" class="img-fluid w-75" alt="team">
+            </div>
+            <div class="col-md-6 align-self-center">
+                <h2 class="fw-bold fs-1">As a team</h2>
+                <p class="fs-5 fw-bold">Join us in building the best online book delivery service.</p>
+                <button class="btn btncol text-white px-4 py-2 fw-bold">Join our team</button>
+            </div>
+        </div>
+
+        @* /// Fourth Section *@
+        <div class="text-center mt-3 border-top border-2">
+            <p class="h2">GET OUR APP NOW</p>
+        </div>
+
+        <div class="row my-5 align-items-center">
+            <div class="col-md-6">
+                <h1 class="fw-bold fs-1">Order your favorite books!</h1>
+                <p class="fs-4 fw-bold">Enjoy a wide selection of books delivered to you with Book Store. Explore various genres from top authors.</p>
+                <button class="btn btncol text-white px-5 py-3 fw-bold">Get App</button>
+            </div>
+            <div class="col-md-6 text-center">
+                <img src="/images/land10.jpg" class="img-fluid w-75" alt="app">
+            </div>
+        </div>
+
+        @* // Toasts *@
+        <div id="toastContainer" class="position-fixed bottom-0 start-0 p-3" style="z-index: 1050;">
+            <div id="toastSuccess" class="toast btncol text-white border-dark border-3 @(result == 1 ? "show" : "")" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header btncol text-white">
+                    <strong class="me-auto h5">Success</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body h6" id="toastSuccessMessage">@Message</div>
+            </div>
+
+            <div id="toastError" class="toast bg-danger text-white border-dark border-3 @(result == 2 ? "show" : "")" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-danger text-white">
+                    <strong class="me-auto h5">Error</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body h6" id="toastErrorMessage">@Message</div>
+            </div>
         </div>
     </div>
-        </div>
 
+
+
+        
 
     @* // Foooter *@
     <div class="mx-4 row m-0 " style="background-color:#D3D3D3">
