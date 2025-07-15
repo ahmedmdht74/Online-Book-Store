@@ -1,6 +1,6 @@
 # 📚 Online Book Store (ASP.NET MVC 9)
 
-A full-featured online bookstore web application built with **ASP.NET MVC 5**, supporting full admin control, user interactions, secure checkout, and dynamic dashboards for both admins and users.
+A full-featured online bookstore web application built with **ASP.NET MVC 9**, supporting full admin control, user interactions, secure checkout, and dynamic dashboards for both admins and users.
 
 ---
 
